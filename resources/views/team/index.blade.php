@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Team — BuildScape CMS')
+@section('title', 'Team')
 @section('page-title', 'Team')
 
 @section('styles')
@@ -53,15 +53,7 @@
             </div>
         </div>
     @endif
-
-    {{-- Header --}}
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-            <h1 class="text-4xl font-extrabold font-headline tracking-tight text-white mb-2">Team</h1>
-            <p class="text-on-surface-variant max-w-lg">Manage your construction taskforce, monitor workload, and track
-                safety certifications.</p>
-        </div>
-    </div>
+  
 
     {{-- Stats --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
@@ -531,6 +523,9 @@
         function submitMemberDrawer() {
             const name = document.getElementById('md-field-name').value.trim();
             if (!name) { if (typeof toast === 'function') toast('Name is required', 'warn'); return; }
+
+            const email = document.getElementById('md-field-email').value.trim();
+if (!email) { if (typeof toast === 'function') toast('Email is required', 'warn'); return; }
 
             const fields = {
                 name, email: document.getElementById('md-field-email').value,

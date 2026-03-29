@@ -21,25 +21,41 @@ class RolePermissionSeeder extends Seeder
             'view dashboard',
 
             // Projects
-            'view projects', 'create projects', 'edit projects', 'delete projects',
+            'view projects',
+            'create projects',
+            'edit projects',
+            'delete projects',
 
             // Tasks
-            'view tasks', 'create tasks', 'edit tasks', 'delete tasks',
+            'view tasks',
+            'create tasks',
+            'edit tasks',
+            'delete tasks',
 
             // Team
-            'view team', 'create team', 'edit team', 'delete team',
+            'view team',
+            'create team',
+            'edit team',
+            'delete team',
 
             // Budget
-            'view budget', 'create expenses', 'approve expenses',
+            'view budget',
+            'create expenses',
+            'approve expenses',
 
             // Documents
-            'view documents', 'upload documents', 'delete documents',
+            'view documents',
+            'upload documents',
+            'delete documents',
 
             // Safety
-            'view safety', 'create incidents', 'resolve incidents',
+            'view safety',
+            'create incidents',
+            'resolve incidents',
 
             // Reports
-            'view reports', 'export reports',
+            'view reports',
+            'export reports',
 
             // Notifications
             'view notifications',
@@ -49,6 +65,10 @@ class RolePermissionSeeder extends Seeder
 
             // Settings
             'manage settings',
+
+            // User Management
+            'manage roles',
+
         ];
 
         foreach ($permissions as $perm) {
@@ -65,27 +85,52 @@ class RolePermissionSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $admin->syncPermissions([
             'view dashboard',
-            'view projects','create projects','edit projects','delete projects',
-            'view tasks','create tasks','edit tasks','delete tasks',
-            'view team','create team','edit team','delete team',
-            'view budget','create expenses','approve expenses',
-            'view documents','upload documents','delete documents',
-            'view safety','create incidents','resolve incidents',
-            'view reports','export reports',
+            'view projects',
+            'create projects',
+            'edit projects',
+            'delete projects',
+            'view tasks',
+            'create tasks',
+            'edit tasks',
+            'delete tasks',
+            'view team',
+            'create team',
+            'edit team',
+            'delete team',
+            'view budget',
+            'create expenses',
+            'approve expenses',
+            'view documents',
+            'upload documents',
+            'delete documents',
+            'view safety',
+            'create incidents',
+            'resolve incidents',
+            'view reports',
+            'export reports',
             'view notifications',
             'manage settings',
+            'manage roles',
+            'view audit log',
         ]);
 
         // 3. Project Manager — manage projects/tasks/budget, view team/docs/safety
         $pm = Role::firstOrCreate(['name' => 'project_manager', 'guard_name' => 'web']);
         $pm->syncPermissions([
             'view dashboard',
-            'view projects','create projects','edit projects',
-            'view tasks','create tasks','edit tasks',
+            'view projects',
+            'create projects',
+            'edit projects',
+            'view tasks',
+            'create tasks',
+            'edit tasks',
             'view team',
-            'view budget','create expenses',
-            'view documents','upload documents',
-            'view safety','create incidents',
+            'view budget',
+            'create expenses',
+            'view documents',
+            'view safety',
+            'create incidents',
+            'view reports',
             'view notifications',
         ]);
 
@@ -94,11 +139,17 @@ class RolePermissionSeeder extends Seeder
         $supervisor->syncPermissions([
             'view dashboard',
             'view projects',
-            'view tasks','create tasks','edit tasks',
+            'view tasks',
+            'create tasks',
+            'edit tasks',
             'view team',
             'view budget',
-            'view documents','upload documents',
-            'view safety','create incidents','resolve incidents',
+            'view documents',
+            'upload documents',
+            'view safety',
+            'create incidents',
+            'resolve incidents',
+            'view reports',
             'view notifications',
         ]);
 
@@ -107,9 +158,11 @@ class RolePermissionSeeder extends Seeder
         $member->syncPermissions([
             'view dashboard',
             'view projects',
-            'view tasks','edit tasks',
+            'view tasks',
+            'edit tasks',
             'view documents',
-            'view safety','create incidents',
+            'view safety',
+            'create incidents',
             'view notifications',
         ]);
 
@@ -125,11 +178,11 @@ class RolePermissionSeeder extends Seeder
         // ── ASSIGN ROLES TO EXISTING USERS ────────────────────
         $roleMap = [
             'superadmin@buildscape.com' => 'super_admin',
-            'admin@buildscape.com'      => 'admin',
-            'pm@buildscape.com'         => 'project_manager',
+            'admin@buildscape.com' => 'admin',
+            'pm@buildscape.com' => 'project_manager',
             'supervisor@buildscape.com' => 'site_supervisor',
-            'member@buildscape.com'     => 'team_member',
-            'client@buildscape.com'     => 'client',
+            'member@buildscape.com' => 'team_member',
+            'client@buildscape.com' => 'client',
         ];
 
         foreach ($roleMap as $email => $role) {

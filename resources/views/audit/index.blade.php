@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Audit Log — Ironclad Forge')
+@section('title', 'Audit Log')
 @section('page-title', 'Audit Log')
 
 @section('styles')
@@ -41,15 +41,6 @@
 
         {{-- ── Page Title ──────────────────────────────────── --}}
         <div class="flex justify-between items-end mb-10">
-            <div>
-                <div class="flex items-center gap-2 text-[#c2c6d6] mb-2">
-                    <span class="text-[10px] uppercase tracking-[0.2em] font-semibold">Security Operations</span>
-                    <span class="material-symbols-outlined text-xs">chevron_right</span>
-                    <span class="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#adc6ff]">System
-                        Integrity</span>
-                </div>
-                <h2 class="text-4xl font-headline font-extrabold tracking-tight text-[#dae2fd]">Audit Log</h2>
-            </div>
             <div class="flex gap-3">
                 <a href="{{ request()->fullUrlWithQuery(['format' => 'json']) }}"
                     class="px-6 py-2.5 bg-[#222a3d] hover:bg-[#2d3449] text-[#dae2fd] text-xs font-bold rounded-xl transition-all border border-[#424754]/10">

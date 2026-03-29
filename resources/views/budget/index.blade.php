@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Budget — BuildScape CMS')
+@section('title', 'Budget')
 @section('page-title', 'Budget')
 
 @section('styles')
@@ -36,41 +36,26 @@
         <script>document.addEventListener('DOMContentLoaded', () => toast(@json(session('success')), 'success'))</script>
     @endif
 
-    @if($alerts->count() > 0)
-        <div class="space-y-2 mb-8">
-            @foreach($alerts->take(2) as $alert)
-                <div
-                    class="flex items-center gap-3 px-5 py-3 rounded-xl border {{ $alert->budget_pct >= 90 ? 'bg-error/10 border-error/20' : 'bg-secondary/10 border-secondary/25' }}">
-                    <span class="material-symbols-outlined text-sm {{ $alert->budget_pct >= 90 ? 'text-error' : 'text-secondary' }}"
-                        style="font-variation-settings:'FILL' 1;">warning</span>
-                    <p class="font-semibold text-sm {{ $alert->budget_pct >= 90 ? 'text-error' : 'text-secondary' }} flex-1">
-                        {{ $alert->budget_pct >= 90 ? 'CRITICAL' : 'WARNING' }} — {{ $alert->project_name }} at
-                        {{ $alert->budget_pct }}% budget used
-                    </p>
-                    <span
-                        class="text-xs text-on-surface-variant">${{ number_format($alert->budget_allocated - $alert->budget_spent) }}
-                        remaining</span>
-                </div>
-            @endforeach
-        </div>
-    @endif
-
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-            <h1 class="text-4xl font-extrabold font-headline tracking-tight text-white mb-1">Budget</h1>
-            <p class="text-on-surface-variant">Financial oversight and expense management for all active sites.</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="#" class="flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
-                <span class="material-symbols-outlined text-base">description</span> Export Excel
+    {{-- Header Section --}}
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+        {{-- Action Links --}}
+        <div class="flex gap-2 p-1 bg-surface-container-low rounded-xl flex-wrap">
+            <a href="{{ route('budget.categories.index') }}" class="px-6 py-2 text-slate-400 hover:text-on-surface font-semibold rounded-lg text-sm transition-all inline-flex items-center gap-2">
+                <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">category</span>
+                Manage Categories
             </a>
-            <a href="#" class="flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
-                <span class="material-symbols-outlined text-base">picture_as_pdf</span> Export PDF
+            <a href="#" class="px-6 py-2 text-slate-400 hover:text-on-surface font-semibold rounded-lg text-sm transition-all inline-flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">description</span>
+                Export Excel
+            </a>
+            <a href="#" class="px-6 py-2 text-slate-400 hover:text-on-surface font-semibold rounded-lg text-sm transition-all inline-flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">picture_as_pdf</span>
+                Export PDF
             </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 ">
         <div class="bg-surface-container rounded-2xl p-7 relative overflow-hidden shadow-lg group">
             <span
                 class="material-symbols-outlined absolute top-4 right-4 text-6xl text-white/5 group-hover:text-white/10 transition-colors">account_balance</span>
@@ -103,6 +88,26 @@
             </p>
         </div>
     </div>
+
+
+        @if($alerts->count() > 0)
+        <div class="space-y-2">
+            @foreach($alerts->take(2) as $alert)
+                <div
+                    class="flex items-center gap-3 px-5 py-3 rounded-xl border {{ $alert->budget_pct >= 90 ? 'bg-error/10 border-error/20' : 'bg-secondary/10 border-secondary/25' }}">
+                    <span class="material-symbols-outlined text-sm {{ $alert->budget_pct >= 90 ? 'text-error' : 'text-secondary' }}"
+                        style="font-variation-settings:'FILL' 1;">warning</span>
+                    <p class="font-semibold text-sm {{ $alert->budget_pct >= 90 ? 'text-error' : 'text-secondary' }} flex-1">
+                        {{ $alert->budget_pct >= 90 ? 'CRITICAL' : 'WARNING' }} — {{ $alert->project_name }} at
+                        {{ $alert->budget_pct }}% budget used
+                    </p>
+                    <span
+                        class="text-xs text-on-surface-variant">${{ number_format($alert->budget_allocated - $alert->budget_spent) }}
+                        remaining</span>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <div class="bg-surface-container rounded-2xl p-8 shadow-lg">
@@ -371,6 +376,8 @@
             @can('approve expenses')
                 <button class="flex-1 bg-primary text-on-primary font-bold py-3 rounded-xl active:scale-95 transition-transform"
                     id="ed-approve-btn">Approve Expense</button>
+
+                    <button class="flex-1 bg-error text-white font-bold py-3 rounded-xl active:scale-95 transition-transform" id="ed-reject-btn">Reject Expense</button>
             @endcan
             <button onclick="closeExpenseDrawer()"
                 class="px-6 py-3 text-on-surface-variant font-bold hover:bg-white/5 rounded-xl transition-colors">Close</button>
@@ -394,7 +401,11 @@
             @foreach($expenses as $exp)
                 @if($exp->status === 'pending')
                     <form id="approve-form-{{ $exp->id }}" method="POST" action="{{ route('budget.approve', $exp->id) }}">@csrf
+                       @method('PATCH')</form>
+                    <form id="reject-form-{{ $exp->id }}" method="POST" action="{{ route('budget.reject', $exp->id) }}">@csrf
                         @method('PATCH')</form>
+
+                        
                 @endif
             @endforeach
         </div>
@@ -427,7 +438,12 @@
             document.getElementById('ed-footer-create').classList.add('hidden');
             const btn = document.getElementById('ed-approve-btn');
             if (status === 'pending') { btn.style.display = ''; btn.onclick = () => { const f = document.getElementById('approve-form-' + id); if (f) f.submit(); }; }
-            else { btn.style.display = 'none'; }
+           else { btn.style.display = 'none'; }
+let rejectBtn = document.getElementById('ed-reject-btn');
+if (rejectBtn) {
+    rejectBtn.style.display = status === 'pending' ? '' : 'none';
+    rejectBtn.onclick = () => { const f = document.getElementById('reject-form-' + id); if (f) f.submit(); };
+}
             _openExpDrw();
         }
         function openAddExpenseDrawer() {

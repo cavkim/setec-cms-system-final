@@ -1,4 +1,4 @@
-<header class="flex justify-between items-center w-full sticky top-0 z-40 py-2 bg-[#0b1326] -mx-10 px-10 mb-2">
+<header class="flex justify-between items-center w-full sticky top-0 z-40 py-4 bg-[#0b1326] px-6 mb-2 ml-0">
     <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-white">@yield('page-title', 'Dashboard')</h1>
         <p class="text-slate-300 text-sm mt-1">Operational Overview for Q{{ ceil(now()->month / 3) }} Fiscal Period</p>
@@ -7,26 +7,44 @@
     <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 bg-[#171f33] rounded-xl px-4 py-2 border border-white/5">
             <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
-            <input class="bg-transparent border-none text-sm text-white focus:ring-0 w-48 outline-none" placeholder="Search projects..."
-                type="text" />
+            <input class="bg-transparent border-none text-sm text-white focus:ring-0 w-48 outline-none"
+                placeholder="Search projects..." type="text" />
         </div>
 
         <div class="flex items-center gap-3">
-            <button
-                class="w-10 h-10 flex items-center justify-center rounded-xl bg-[#222a3d] text-[#dae2fd] hover:bg-[#2d3449] transition-colors"
-                onclick="toast('Notifications panel coming soon','info')">
+            {{-- Notification Bell with unread badge --}}
+            @php
+                $topbarUnread = 0;
+                if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
+                    $topbarUnread = \Illuminate\Support\Facades\DB::table('notifications')
+                        ->where('notifiable_type', 'App\\Models\\User')
+                        ->where('notifiable_id', auth()->id())
+                        ->whereNull('read_at')
+                        ->count();
+                }
+            @endphp
+            <button id="notif-bell-btn"
+                class="relative w-10 h-10 flex items-center justify-center rounded-xl bg-[#222a3d] text-[#dae2fd] hover:bg-[#2d3449] transition-colors"
+                onclick="openNotifDrawer()" aria-label="Notifications">
                 <span class="material-symbols-outlined">notifications</span>
+                @if($topbarUnread > 0)
+                    <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
+                                 bg-[#ffb95f] text-[#2a1700] text-[9px] font-black
+                                 rounded-full flex items-center justify-center leading-none">
+                        {{ $topbarUnread > 99 ? '99+' : $topbarUnread }}
+                    </span>
+                @endif
             </button>
-            <button
-                class="w-10 h-10 flex items-center justify-center rounded-xl bg-[#222a3d] text-[#dae2fd] hover:bg-[#2d3449] transition-colors"
-                onclick="toast('Settings panel coming soon','info')">
+            {{-- Settings / Profile --}}
+            <a class="w-10 h-10 flex items-center justify-center rounded-xl bg-[#222a3d] text-[#dae2fd] hover:bg-[#2d3449] transition-colors"
+                title="Settings & Profile" aria-label="Settings">
                 <span class="material-symbols-outlined">settings</span>
-            </button>
+            </a>
 
-            {{-- User Avatar → triggers slide-over drawer --}}
             <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#adc6ff]/20 cursor-pointer hover:border-[#adc6ff]/50 transition-all"
                 onclick="openUserDrawer()" title="My Account">
-                <div class="w-full h-full bg-gradient-to-br from-[#1565C0] to-[#42A5F5] text-white text-[11px] font-bold flex items-center justify-center">
+                <div
+                    class="w-full h-full bg-gradient-to-br from-[#1565C0] to-[#42A5F5] text-white text-[11px] font-bold flex items-center justify-center">
                     {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
             </div>
@@ -34,20 +52,19 @@
     </div>
 </header>
 
-{{-- ══════════════════════════════════════════════════════════ --}}
-{{--  USER PROFILE DRAWER (triggered by avatar click)           --}}
-{{-- ══════════════════════════════════════════════════════════ --}}
+{{-- Backdrop --}}
 <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] transition-opacity duration-300 opacity-0 pointer-events-none"
     id="user-drawer-backdrop" onclick="closeUserDrawer()"></div>
 
+{{-- Drawer --}}
 <div class="fixed top-0 right-0 h-full w-full max-w-sm bg-[#0b1326] border-l border-[#424754]/30 shadow-2xl z-[90]
-            flex flex-col transform translate-x-full transition-transform duration-400 ease-in-out"
-    id="user-drawer">
+            flex flex-col transform translate-x-full transition-transform duration-400 ease-in-out" id="user-drawer">
 
     {{-- Header --}}
     <div class="px-6 py-5 border-b border-[#424754]/20 bg-[#171f33] flex items-center justify-between">
         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#adc6ff]">My Account</span>
-        <button class="p-1.5 hover:bg-[#2d3449] rounded-full text-[#c2c6d6] transition-colors" onclick="closeUserDrawer()">
+        <button class="p-1.5 hover:bg-[#2d3449] rounded-full text-[#c2c6d6] transition-colors"
+            onclick="closeUserDrawer()">
             <span class="material-symbols-outlined text-lg">close</span>
         </button>
     </div>
@@ -55,14 +72,16 @@
     {{-- Profile info --}}
     <div class="px-6 py-6 border-b border-[#424754]/10">
         <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1565C0] to-[#42A5F5] flex items-center justify-center text-white text-xl font-black shadow-lg shadow-blue-900/30">
+            <div
+                class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1565C0] to-[#42A5F5] flex items-center justify-center text-white text-xl font-black shadow-lg shadow-blue-900/30">
                 {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
             </div>
             <div>
-                <h2 class="text-base font-headline font-bold text-[#dae2fd] leading-tight">{{ auth()->user()->name }}</h2>
+                <h2 class="text-base font-bold text-[#dae2fd] leading-tight">{{ auth()->user()->name }}</h2>
                 <p class="text-xs text-[#c2c6d6] mt-0.5">{{ auth()->user()->email }}</p>
                 @php $roleLabel = auth()->user()->getRoleNames()->first() ?? 'user'; @endphp
-                <span class="inline-block mt-1.5 px-2 py-0.5 bg-[#adc6ff]/10 text-[#adc6ff] text-[9px] rounded font-bold uppercase tracking-widest ring-1 ring-[#adc6ff]/20">
+                <span
+                    class="inline-block mt-1.5 px-2 py-0.5 bg-[#adc6ff]/10 text-[#adc6ff] text-[9px] rounded font-bold uppercase tracking-widest ring-1 ring-[#adc6ff]/20">
                     {{ $roleLabel }}
                 </span>
             </div>
@@ -74,14 +93,14 @@
         <p class="text-[9px] text-[#8c909f] uppercase font-bold tracking-[0.15em] mb-3">Your Permissions</p>
         <div class="grid grid-cols-2 gap-2">
             @foreach(auth()->user()->getAllPermissions()->pluck('name') as $perm)
-            <div class="flex items-center gap-2 bg-[#131b2e] rounded-lg px-3 py-2 border border-[#424754]/10">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#adc6ff] flex-shrink-0"></span>
-                <span class="text-[9px] text-[#c2c6d6] font-medium truncate">{{ $perm }}</span>
-            </div>
+                <div class="flex items-center gap-2 bg-[#131b2e] rounded-lg px-3 py-2 border border-[#424754]/10">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#adc6ff] flex-shrink-0"></span>
+                    <span class="text-[9px] text-[#c2c6d6] font-medium truncate">{{ $perm }}</span>
+                </div>
             @endforeach
 
             @if(auth()->user()->getAllPermissions()->isEmpty())
-            <div class="col-span-2 text-[10px] text-[#8c909f] italic">No specific permissions assigned.</div>
+                <div class="col-span-2 text-[10px] text-[#8c909f] italic">No specific permissions assigned.</div>
             @endif
         </div>
     </div>
@@ -112,17 +131,18 @@
 </div>
 
 <script>
-function openUserDrawer() {
-    document.getElementById('user-drawer-backdrop').classList.remove('opacity-0','pointer-events-none');
-    document.getElementById('user-drawer-backdrop').classList.add('opacity-100');
-    document.getElementById('user-drawer').style.transform = 'translateX(0)';
-}
-function closeUserDrawer() {
-    document.getElementById('user-drawer-backdrop').classList.add('opacity-0','pointer-events-none');
-    document.getElementById('user-drawer-backdrop').classList.remove('opacity-100');
-    document.getElementById('user-drawer').style.transform = 'translateX(100%)';
-}
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeUserDrawer();
-});
+    function openUserDrawer() {
+        document.getElementById('user-drawer-backdrop').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('user-drawer-backdrop').classList.add('opacity-100');
+        document.getElementById('user-drawer').style.transform = 'translateX(0)';
+    }
+    function closeUserDrawer() {
+        document.getElementById('user-drawer-backdrop').classList.add('opacity-0', 'pointer-events-none');
+        document.getElementById('user-drawer-backdrop').classList.remove('opacity-100');
+        document.getElementById('user-drawer').style.transform = 'translateX(100%)';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUserDrawer(); });
 </script>
+
+{{-- ── Notification Drawer ── --}}
+@include('notifications.notification-drawer')

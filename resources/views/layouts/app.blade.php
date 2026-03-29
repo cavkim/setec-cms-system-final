@@ -83,16 +83,19 @@
 
 <body class="h-screen w-screen overflow-hidden bg-[#0b1326] text-[#dae2fd] antialiased flex flex-row">
 
-    @if (request()->routeIs('dashboard') || request()->routeIs('projects.*') || request()->routeIs('tasks.*') || request()->routeIs('team.*') || request()->routeIs('budget.*') || request()->routeIs('documents.*') || request()->routeIs('safety.*') || request()->routeIs('reports.*') || request()->routeIs('audit.*') || request()->routeIs('audit-logs.*'))
+    @if (request()->routeIs('dashboard') || request()->routeIs('projects.*') || request()->routeIs('tasks.*') || request()->routeIs('team.*') || request()->routeIs('budget.*') || request()->routeIs('documents.*') || request()->routeIs('safety.*') || request()->routeIs('reports.*') || request()->routeIs('audit.*') || request()->routeIs('audit-logs.*') || request()->routeIs('profile.*') || request()->routeIs('notifications.*') || request()->routeIs('users.*') || request()->routeIs('roles.*'))
         @include('components.dashboard-sidebar')
-        <main class="ml-64 w-[calc(100%-16rem)] h-screen overflow-y-auto p-10 flex flex-col gap-8 bg-[#0b1326]">
+        <main id="main-content"
+            class="ml-64 w-[calc(100%-16rem)] h-screen overflow-y-auto flex flex-col bg-[#0b1326] transition-all duration-300">
             @include('components.dashboard-topbar')
-            @yield('content')
+            <div class="px-10 pt-6 pb-10 flex flex-col gap-8">
+                @yield('content')
+            </div>
         </main>
     @else
         @include('components.sidebar')
         <div class="main">
-            @include('components.topbar')
+            @include('components.dashboard-topbar')
             <div class="content">
                 @yield('content')
             </div>

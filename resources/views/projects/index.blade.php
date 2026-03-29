@@ -1,4 +1,4 @@
-{{-- resources/views/projects/index.blade.php --}}
+<!-- {{-- resources/views/projects/index.blade.php --}}
 @extends('layouts.app')
 @section('title', 'Projects — BuildScape CMS')
 @section('page-title', 'Projects')
@@ -510,4 +510,4 @@
 
 @section('scripts')
     <script src="{{ asset('js/buildscape/modules/projects.js') }}"></script>
-@endsection
+@endsection -->

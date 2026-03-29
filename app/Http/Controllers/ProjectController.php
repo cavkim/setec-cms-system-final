@@ -6,11 +6,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Project;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+// use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProjectController extends Controller
 {
-    use AuthorizesRequests;
+    // use AuthorizesRequests;
     public function index(Request $request)
     {
         $query = DB::table('projects')
@@ -46,26 +46,29 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', Project::class);
+        abort_unless(auth()->user()->can('create projects'), 403);
 
         $request->validate([
-            'project_name' => 'required|string|max:200',
-            'location' => 'nullable|string|max:200',
+            'project_name' => 'required|string|min:3|max:200',
+            'location' => 'required|string|min:2|max:200',
+            'description' => 'nullable|string|max:1000',
             'status' => 'required|in:planning,in_progress,on_hold,completed,cancelled',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
-            'budget_allocated' => 'nullable|numeric|min:0',
+            'budget_allocated' => 'required|numeric|min:0.01',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'progress_percent' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $project = Project::create([
             'project_name' => $request->project_name,
-            'location' => $request->location ?? '',
+            'location' => $request->location,
+            'description' => $request->description ?? '',
             'status' => $request->status,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            'budget_allocated' => $request->budget_allocated ?? 0,
+            'budget_allocated' => $request->budget_allocated,
             'budget_spent' => 0,
-            'progress_percent' => 0,
+            'progress_percent' => $request->progress_percent ?? 0,
         ]);
 
         return redirect()->route('projects.index')
@@ -74,22 +77,26 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project)
     {
-        $this->authorize('update', $project);
+        abort_unless(auth()->user()->can('edit projects'), 403);
 
         $request->validate([
-            'project_name' => 'required|string|max:200',
+            'project_name' => 'required|string|min:3|max:200',
+            'location' => 'required|string|min:2|max:200',
             'status' => 'required|in:planning,in_progress,on_hold,completed,cancelled',
+            'budget_allocated' => 'required|numeric|min:0.01',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'progress_percent' => 'nullable|numeric|min:0|max:100',
-            'budget_allocated' => 'nullable|numeric|min:0',
         ]);
 
         $project->update([
             'project_name' => $request->project_name,
             'location' => $request->location,
+            'description' => $request->description ?? '',
             'status' => $request->status,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
-            'budget_allocated' => $request->budget_allocated ?? $project->budget_allocated,
+            'budget_allocated' => $request->budget_allocated,
             'progress_percent' => $request->progress_percent ?? $project->progress_percent,
         ]);
 
@@ -99,7 +106,7 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        $this->authorize('delete', $project);
+        abort_unless(auth()->user()->can('delete projects'), 403);
 
         $name = $project->project_name;
         $project->delete();

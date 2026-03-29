@@ -27,8 +27,8 @@ class DocumentController extends Controller
             }
             if ($request->search) {
                 $query->where(function ($q) use ($request) {
-                    $q->where('documents.document_name', 'like', '%'.$request->search.'%')
-                        ->orWhere('projects.project_name', 'like', '%'.$request->search.'%');
+                    $q->where('documents.document_name', 'like', '%' . $request->search . '%')
+                        ->orWhere('projects.project_name', 'like', '%' . $request->search . '%');
                 });
             }
 
@@ -54,7 +54,8 @@ class DocumentController extends Controller
             'project_id' => 'required|exists:projects,id',
             'document_name' => 'required|string|max:200',
             'document_type' => 'required|in:contract,permit,blueprint,report,photo,inspection,other',
-            'file' => 'required|file|max:51200',
+            'file' => 'required|file|max:51200|mimes:pdf,doc,docx,dwg,jpg,jpeg,png,xlsx,zip',
+            'description' => 'nullable|string|max:500',
         ]);
 
         $file = $request->file('file');
@@ -80,13 +81,14 @@ class DocumentController extends Controller
 
     public function download($id)
     {
+        abort_unless(auth()->user()->can('view documents'), 403);
+
         $doc = DB::table('documents')->where('id', $id)->first();
-        if (! $doc) {
-            abort(404);
-        }
+        abort_unless($doc, 404);
+
         $name = $doc->document_name;
         if ($doc->file_extension) {
-            $name .= '.'.ltrim($doc->file_extension, '.');
+            $name .= '.' . ltrim($doc->file_extension, '.');
         }
 
         return Storage::disk('public')->download($doc->file_url, $name);
@@ -95,10 +97,10 @@ class DocumentController extends Controller
     public function destroy($id)
     {
         $doc = DB::table('documents')->where('id', $id)->first();
-        if ($doc) {
-            Storage::disk('public')->delete($doc->file_url);
-            DB::table('documents')->where('id', $id)->delete();
-        }
+        abort_unless($doc, 404);
+
+        Storage::disk('public')->delete($doc->file_url);
+        DB::table('documents')->where('id', $id)->delete();
 
         return redirect()->route('documents.index')->with('success', 'Document deleted.');
     }

@@ -30,9 +30,9 @@ class TeamController extends Controller
 
         if ($request->search) {
             $query->where(function ($q) use ($request) {
-                $q->where('users.name', 'like', '%'.$request->search.'%')
-                    ->orWhere('users.email', 'like', '%'.$request->search.'%')
-                    ->orWhere('team_members.role', 'like', '%'.$request->search.'%');
+                $q->where('users.name', 'like', '%' . $request->search . '%')
+                    ->orWhere('users.email', 'like', '%' . $request->search . '%')
+                    ->orWhere('team_members.role', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -83,13 +83,16 @@ class TeamController extends Controller
         $request->validate([
             'name' => 'required|string|max:200',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:6',  // ← validation rule not bcrypt
+            'role' => 'nullable|string',
+            'certification_number' => 'nullable|string|max:100',
+            'certification_expiry' => 'nullable|date',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => bcrypt($request->password),  // ← hash here not in validate
         ]);
 
         DB::table('team_members')->insert([
@@ -102,7 +105,7 @@ class TeamController extends Controller
         ]);
 
         return redirect()->route('team.index')
-            ->with('success', 'Team member "'.$user->name.'" added!');
+            ->with('success', 'Team member "' . $user->name . '" added!');
     }
 
     public function show(string $team)
@@ -119,9 +122,16 @@ class TeamController extends Controller
     {
         $id = (int) $team;
 
+        // $request->validate([
+        //     'name' => 'required|string|max:200',
+        //     'email' => 'required|email|unique:users,email,' . $id,
+        // ]);
         $request->validate([
             'name' => 'required|string|max:200',
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role' => 'nullable|string',
+            'certification_number' => 'nullable|string|max:100',
+            'certification_expiry' => 'nullable|date',
         ]);
 
         DB::table('users')->where('id', $id)->update([
@@ -158,6 +168,6 @@ class TeamController extends Controller
         DB::table('users')->where('id', $id)->delete();
 
         return redirect()->route('team.index')
-            ->with('success', '"'.$name.'" removed.');
+            ->with('success', '"' . $name . '" removed.');
     }
 }

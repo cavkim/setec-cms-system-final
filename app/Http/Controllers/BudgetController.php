@@ -35,7 +35,7 @@ class BudgetController extends Controller
                 : 0,
         ];
 
-        $alerts = $projects->filter(fn ($p) => $p->budget_pct >= 70)
+        $alerts = $projects->filter(fn($p) => $p->budget_pct >= 70)
             ->sortByDesc('budget_pct');
 
         $expenses = collect();
@@ -99,9 +99,11 @@ class BudgetController extends Controller
     {
         $request->validate([
             'project_id' => 'required|exists:projects,id',
-            'description' => 'required|string',
-            'amount' => 'required|numeric|min:0',
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0.01|max:999999999',
             'expense_date' => 'required|date',
+            'category_id' => 'nullable|exists:budget_categories,id',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         DB::table('expenses')->insert([
@@ -115,6 +117,8 @@ class BudgetController extends Controller
             'notes' => $request->notes,
             'created_at' => now(),
             'updated_at' => now(),
+
+
         ]);
 
         $total = DB::table('expenses')
@@ -127,22 +131,53 @@ class BudgetController extends Controller
         return redirect()->route('budget.index')->with('success', 'Expense added!');
     }
 
+
     public function approveExpense(Request $request, $id)
     {
-        DB::table('expenses')->where('id', $id)->update([
-            'status' => 'approved',
-            'approved_by' => auth()->id(),
-            'updated_at' => now(),
-        ]);
+        abort_unless(auth()->user()->can('approve expenses'), 403);
 
-        $expense = DB::table('expenses')->where('id', $id)->first();
-        $total = DB::table('expenses')
-            ->where('project_id', $expense->project_id)
-            ->where('status', 'approved')
-            ->sum('amount');
-        DB::table('projects')->where('id', $expense->project_id)
-            ->update(['budget_spent' => $total, 'updated_at' => now()]);
+        DB::transaction(function () use ($id) {
+            $expense = DB::table('expenses')->where('id', $id)->firstOrFail();
+
+            DB::table('expenses')->where('id', $id)->update([
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
+                'updated_at' => now(),
+            ]);
+
+            $total = DB::table('expenses')
+                ->where('project_id', $expense->project_id)
+                ->where('status', 'approved')
+                ->sum('amount');
+
+            DB::table('projects')->where('id', $expense->project_id)
+                ->update(['budget_spent' => $total, 'updated_at' => now()]);
+        });
 
         return redirect()->route('budget.index')->with('success', 'Expense approved!');
+    }
+
+    public function rejectExpense(Request $request, $id)
+    {
+        abort_unless(auth()->user()->can('approve expenses'), 403);
+
+        DB::transaction(function () use ($id) {
+            $expense = DB::table('expenses')->where('id', $id)->firstOrFail();
+
+            DB::table('expenses')->where('id', $id)->update([
+                'status' => 'rejected',
+                'updated_at' => now(),
+            ]);
+
+            $total = DB::table('expenses')
+                ->where('project_id', $expense->project_id)
+                ->where('status', 'approved')
+                ->sum('amount');
+
+            DB::table('projects')->where('id', $expense->project_id)
+                ->update(['budget_spent' => $total, 'updated_at' => now()]);
+        });
+
+        return redirect()->route('budget.index')->with('success', 'Expense rejected.');
     }
 }

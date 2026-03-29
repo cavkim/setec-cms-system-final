@@ -24,10 +24,10 @@
 
 {{-- ── Page Title ──────────────────────────────────── --}}
 <div class="flex justify-between items-end mb-10">
-    <div>
+    <!-- <div>
         <p class="font-label text-xs text-[#adc6ff] uppercase tracking-[0.2em] font-bold mb-2">Analytics Engine</p>
         <h2 class="font-headline text-4xl font-extrabold text-[#dae2fd] tracking-tight">Project Reporting</h2>
-    </div>
+    </div> -->
     @can('export reports')
     <a href="{{ route('reports.export','projects') }}"
         class="bg-gradient-to-br from-[#adc6ff] to-[#4d8eff] px-6 py-3 rounded-xl font-headline font-bold text-sm text-[#002e6a] shadow-lg shadow-[#adc6ff]/20 flex items-center gap-2 hover:opacity-90 transition-all">

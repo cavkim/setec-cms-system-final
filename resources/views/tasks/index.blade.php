@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Tasks — BuildScape CMS')
+@section('title', 'Tasks')
 @section('page-title', 'Tasks')
 
 @section('styles')
@@ -39,6 +39,23 @@
             opacity: 1;
             pointer-events: auto;
         }
+
+        /* Kanban drag-and-drop */
+        .kanban-card[draggable="true"] {
+            cursor: grab;
+        }
+        .kanban-card[draggable="true"]:active {
+            cursor: grabbing;
+        }
+        .kanban-card.dragging {
+            opacity: 0.4;
+            transform: scale(0.97);
+        }
+        .kanban-col.drag-over {
+            outline: 2px dashed rgba(173,198,255,0.5);
+            outline-offset: -4px;
+            background: rgba(173,198,255,0.04);
+        }
     </style>
 @endsection
 
@@ -49,15 +66,8 @@
     @endif
 
     {{-- Header --}}
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-            <div class="flex items-center gap-2 text-primary font-bold text-sm mb-1">
-                <span class="material-symbols-outlined text-sm">home_work</span>
-                SITE 402-B / OPERATIONAL
-            </div>
-            <h1 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface">Tasks</h1>
-            <p class="text-on-surface-variant font-medium mt-1">Manage and track all project tasks across your sites.</p>
-        </div>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        
         <div class="flex flex-wrap items-center gap-3">
             <div class="bg-surface-container rounded-xl flex p-1">
                 <a href="{{ route('tasks.index', array_merge(request()->query(), ['view' => 'list'])) }}"
@@ -128,23 +138,33 @@
     {{-- Table / Kanban --}}
     @if(request('view') === 'kanban')
         {{-- KANBAN VIEW --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="kanban-board">
             @foreach(['pending' => ['#ffb95f', 'Pending'], 'in_progress' => ['#adc6ff', 'In Progress'], 'completed' => ['#b9c8de', 'Completed']] as $status => [$color, $label])
-                <div class="bg-surface-container rounded-2xl overflow-hidden shadow-lg">
+                <div class="bg-surface-container rounded-2xl overflow-hidden shadow-lg"
+                     data-col="{{ $status }}">
                     <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <div class="w-2 h-2 rounded-full" style="background:{{ $color }}"></div>
                             <span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">{{ $label }}</span>
                         </div>
                         <span
-                            class="text-xs font-bold text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full">
+                            class="text-xs font-bold text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full kanban-count"
+                            id="kanban-count-{{ $status }}">
                             {{ $tasks->filter(fn($t) => $t->status === $status)->count() }}
                         </span>
                     </div>
-                    <div class="p-3 space-y-2 min-h-[120px]">
+                    <div class="p-3 space-y-2 min-h-[120px] kanban-col"
+                         data-status="{{ $status }}"
+                         ondragover="kanbanDragOver(event)"
+                         ondragleave="kanbanDragLeave(event)"
+                         ondrop="kanbanDrop(event)">
                         @foreach($tasks->filter(fn($t) => $t->status === $status) as $t)
                             <div
-                                class="bg-surface-container-high p-4 rounded-xl border border-white/5 cursor-pointer hover:border-primary/30 transition-colors {{ $t->status === 'completed' ? 'opacity-60' : '' }}">
+                                class="kanban-card bg-surface-container-high p-4 rounded-xl border border-white/5 hover:border-primary/30 transition-all select-none {{ $t->status === 'completed' ? 'opacity-60' : '' }}"
+                                draggable="true"
+                                data-task-id="{{ $t->id }}"
+                                data-status="{{ $t->status }}"
+                                ondragstart="kanbanDragStart(event)">
                                 <p class="text-sm font-semibold text-on-surface mb-1 {{ $t->status === 'completed' ? 'line-through' : '' }}">
                                     {{ $t->task_name }}</p>
                                 <p class="text-xs text-on-surface-variant mb-3">{{ $t->project_name }}</p>
@@ -192,11 +212,11 @@
                                     : ($task->status === 'in_progress' ? 'bg-primary-container/20 text-primary border border-primary/20'
                                         : ($task->status === 'cancelled' ? 'bg-error-container/20 text-error' : 'bg-surface-container-highest text-on-surface-variant'));
                                 $statusLabel = ucfirst(str_replace('_', ' ', $task->status));
-                                $canEdit = auth()->user()->can('update', $task);
+                                $canEdit = $task->_model ? auth()->user()->can('update', $task->_model) : false;
                             @endphp
                             <tr class="hover:bg-white/[0.04] transition-colors {{ $canEdit ? 'cursor-pointer group' : '' }} relative"
                                 @if($canEdit)
-                                    onclick="openTaskDrawer(this, {{ $task->id }}, '{{ addslashes($task->task_name) }}', '{{ $task->priority }}', '{{ $task->status }}', '{{ addslashes($task->project_name) }}', '{{ addslashes($task->assignee ?? '') }}', '{{ $task->due_date ?? '' }}', {{ $task->progress_percent ?? 0 }}, '{{ addslashes($task->description ?? '') }}')"
+                                    onclick="openTaskDrawer(this, {{ $task->id }}, '{{ addslashes($task->task_name) }}', '{{ $task->priority }}', '{{ $task->status }}', {{ $task->project_id }}, '{{ addslashes($task->project_name) }}', {{ $task->assigned_to ?? 'null' }}, '{{ addslashes($task->assignee ?? '') }}', '{{ $task->due_date ?? '' }}', {{ $task->progress_percent ?? 0 }}, '{{ addslashes($task->description ?? '') }}')"
                                 @endif>
                                 <td class="px-6 py-5">
                                     <div class="flex items-center gap-3">
@@ -258,13 +278,13 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-5 text-center" onclick="event.stopPropagation()">
-                                    @can('update', $task)
+                                    @if($task->_model && auth()->user()->can('update', $task->_model))
                                         <button
                                             class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant hover:text-primary"
-                                            onclick="openTaskDrawer(this.closest('tr'), {{ $task->id }}, '{{ addslashes($task->task_name) }}', '{{ $task->priority }}', '{{ $task->status }}', '{{ addslashes($task->project_name) }}', '{{ addslashes($task->assignee ?? '') }}', '{{ $task->due_date ?? '' }}', {{ $task->progress_percent ?? 0 }}, '{{ addslashes($task->description ?? '') }}')">
+                                            onclick="openTaskDrawer(this.closest('tr'), {{ $task->id }}, '{{ addslashes($task->task_name) }}', '{{ $task->priority }}', '{{ $task->status }}', {{ $task->project_id }}, '{{ addslashes($task->project_name) }}', {{ $task->assigned_to ?? 'null' }}, '{{ addslashes($task->assignee ?? '') }}', '{{ $task->due_date ?? '' }}', {{ $task->progress_percent ?? 0 }}, '{{ addslashes($task->description ?? '') }}')">
                                             <span class="material-symbols-outlined text-xl">edit_note</span>
                                         </button>
-                                    @endcan
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -505,11 +525,102 @@
 @section('scripts')
     <script>
         const tasksBase = @json(url('/tasks'));
+        const csrfToken = @json(csrf_token());
+
+        // ── Kanban drag-and-drop ──────────────────────────────
+        let _dragCard = null;
+
+        function kanbanDragStart(e) {
+            _dragCard = e.currentTarget;
+            _dragCard.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', _dragCard.dataset.taskId);
+        }
+
+        document.addEventListener('dragend', () => {
+            if (_dragCard) {
+                _dragCard.classList.remove('dragging');
+                _dragCard = null;
+            }
+            document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+        });
+
+        function kanbanDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function kanbanDragLeave(e) {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+        }
+
+        function kanbanDrop(e) {
+            e.preventDefault();
+            const col = e.currentTarget;
+            col.classList.remove('drag-over');
+
+            const newStatus = col.dataset.status;
+            if (!_dragCard || _dragCard.dataset.status === newStatus) return;
+
+            const taskId = _dragCard.dataset.taskId;
+            const oldStatus = _dragCard.dataset.status;
+
+            // Optimistically move card in DOM
+            col.appendChild(_dragCard);
+            _dragCard.dataset.status = newStatus;
+
+            // Update completed styling
+            const nameEl = _dragCard.querySelector('p:first-child');
+            if (newStatus === 'completed') {
+                _dragCard.classList.add('opacity-60');
+                nameEl && nameEl.classList.add('line-through');
+            } else {
+                _dragCard.classList.remove('opacity-60');
+                nameEl && nameEl.classList.remove('line-through');
+            }
+
+            // Update column counts
+            const oldCount = document.getElementById('kanban-count-' + oldStatus);
+            const newCount = document.getElementById('kanban-count-' + newStatus);
+            if (oldCount) oldCount.textContent = parseInt(oldCount.textContent) - 1;
+            if (newCount) newCount.textContent = parseInt(newCount.textContent) + 1;
+
+            // Persist to server
+            fetch(tasksBase + '/' + taskId + '/status', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('Server error ' + r.status);
+                return r.json();
+            })
+            .then(() => {
+                if (typeof toast === 'function') toast('Status updated', 'success');
+            })
+            .catch(() => {
+                // Revert on failure
+                const origCol = document.querySelector('.kanban-col[data-status="' + oldStatus + '"]');
+                if (origCol) origCol.appendChild(_dragCard);
+                _dragCard.dataset.status = oldStatus;
+                if (oldCount) oldCount.textContent = parseInt(oldCount.textContent) + 1;
+                if (newCount) newCount.textContent = parseInt(newCount.textContent) - 1;
+                if (typeof toast === 'function') toast('Failed to update status', 'error');
+            });
+        }
+        // ── End Kanban ───────────────────────────────────────
 
         window.__tdMode = null;
         window.__tdTaskId = null;
 
-        function openTaskDrawer(row, id, name, priority, status, project, assignee, due, progress, desc) {
+        function openTaskDrawer(row, id, name, priority, status, projectId, projectName, assignedToId, assigneeName, due, progress, desc) {
             window.__tdMode = 'edit';
             window.__tdTaskId = id;
 
@@ -518,7 +629,7 @@
 
             // Header
             document.getElementById('td-title').textContent = name;
-            document.getElementById('td-subtitle').textContent = project;
+            document.getElementById('td-subtitle').textContent = projectName;
             document.getElementById('td-task-id').textContent = 'TASK-' + String(id).padStart(4, '0');
 
             // Priority badge
@@ -529,25 +640,43 @@
                     (priority === 'medium' ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-highest text-on-surface-variant'));
 
             // Fields
-            document.getElementById('td-field-name').value = name;
-            document.getElementById('td-field-desc').value = desc || '';
-            document.getElementById('td-field-priority').value = priority;
-            document.getElementById('td-field-status').value = status;
-            document.getElementById('td-field-due').value = due || '';
+            const nameField = document.getElementById('td-field-name');
+            if (nameField) nameField.value = name;
+            const projectField = document.getElementById('td-field-project');
+            if (projectField) projectField.value = projectId;
+            const descField = document.getElementById('td-field-desc');
+            if (descField) descField.value = desc || '';
+            const priorityField = document.getElementById('td-field-priority');
+            if (priorityField) priorityField.value = priority;
+            const statusField = document.getElementById('td-field-status');
+            if (statusField) statusField.value = status;
+            const assignedField = document.getElementById('td-field-assigned');
+            if (assignedField) assignedField.value = assignedToId || '';
+            const dueField = document.getElementById('td-field-due');
+            if (dueField) dueField.value = due || '';
             const prog = parseInt(progress) || 0;
-            document.getElementById('td-field-progress').value = prog;
-            document.getElementById('td-pct-label').textContent = prog + '%';
-            document.getElementById('td-progress-bar').style.width = prog + '%';
+            const progressField = document.getElementById('td-field-progress');
+            if (progressField) progressField.value = prog;
+            const pctLabel = document.getElementById('td-pct-label');
+            if (pctLabel) pctLabel.textContent = prog + '%';
+            const progressBar = document.getElementById('td-progress-bar');
+            if (progressBar) progressBar.style.width = prog + '%';
 
             // UI state
-            document.getElementById('td-save-btn').textContent = 'Save Changes';
-            document.getElementById('td-delete-btn').classList.remove('hidden');
-            document.getElementById('td-delete-sep').classList.remove('hidden');
-            document.getElementById('td-create-banner').classList.add('hidden');
+            const saveBtn = document.getElementById('td-save-btn');
+            if (saveBtn) saveBtn.textContent = 'Save Changes';
+            const deleteBtn = document.getElementById('td-delete-btn');
+            if (deleteBtn) deleteBtn.classList.remove('hidden');
+            const deleteSep = document.getElementById('td-delete-sep');
+            if (deleteSep) deleteSep.classList.remove('hidden');
+            const createBanner = document.getElementById('td-create-banner');
+            if (createBanner) createBanner.classList.add('hidden');
 
-            // Forms
-            document.getElementById('td-update-form').action = tasksBase + '/' + id;
-            document.getElementById('td-delete-form').action = tasksBase + '/' + id;
+            // Forms - set actions only if forms exist
+            const updateForm = document.getElementById('td-update-form');
+            if (updateForm) updateForm.action = tasksBase + '/' + id;
+            const deleteForm = document.getElementById('td-delete-form');
+            if (deleteForm) deleteForm.action = tasksBase + '/' + id;
 
             _openDrawer();
         }
@@ -566,21 +695,39 @@
             badge.textContent = 'New';
             badge.className = 'px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-primary/20 text-primary';
 
-            ['td-field-name', 'td-field-desc'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('td-field-priority').value = 'medium';
-            document.getElementById('td-field-status').value = 'pending';
-            document.getElementById('td-field-due').value = '';
-            document.getElementById('td-field-progress').value = 0;
-            document.getElementById('td-pct-label').textContent = '0%';
-            document.getElementById('td-progress-bar').style.width = '0%';
+            ['td-field-name', 'td-field-desc'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const projectField = document.getElementById('td-field-project');
+            if (projectField) projectField.value = '';
+            const assignedField = document.getElementById('td-field-assigned');
+            if (assignedField) assignedField.value = '';
+            const priorityField = document.getElementById('td-field-priority');
+            if (priorityField) priorityField.value = 'medium';
+            const statusField = document.getElementById('td-field-status');
+            if (statusField) statusField.value = 'pending';
+            const dueField = document.getElementById('td-field-due');
+            if (dueField) dueField.value = '';
+            const progressField = document.getElementById('td-field-progress');
+            if (progressField) progressField.value = 0;
+            const pctLabel = document.getElementById('td-pct-label');
+            if (pctLabel) pctLabel.textContent = '0%';
+            const progressBar = document.getElementById('td-progress-bar');
+            if (progressBar) progressBar.style.width = '0%';
 
-            document.getElementById('td-save-btn').textContent = 'Create Task';
-            document.getElementById('td-delete-btn').classList.add('hidden');
-            document.getElementById('td-delete-sep').classList.add('hidden');
-            document.getElementById('td-create-banner').classList.remove('hidden');
+            const saveBtn = document.getElementById('td-save-btn');
+            if (saveBtn) saveBtn.textContent = 'Create Task';
+            const deleteBtn = document.getElementById('td-delete-btn');
+            if (deleteBtn) deleteBtn.classList.add('hidden');
+            const deleteSep = document.getElementById('td-delete-sep');
+            if (deleteSep) deleteSep.classList.add('hidden');
+            const createBanner = document.getElementById('td-create-banner');
+            if (createBanner) createBanner.classList.remove('hidden');
 
             _openDrawer();
-            setTimeout(() => document.getElementById('td-field-name').focus(), 300);
+            const nameField = document.getElementById('td-field-name');
+            if (nameField) setTimeout(() => nameField.focus(), 300);
         }
 
         function _openDrawer() {
@@ -601,9 +748,12 @@
             const name = document.getElementById('td-field-name').value.trim();
             if (!name) { if (typeof toast === 'function') toast('Task name is required', 'warn'); return; }
 
+            const projectId = document.getElementById('td-field-project').value.trim();
+            if (!projectId) { if (typeof toast === 'function') toast('Project is required', 'warn'); return; }
+
             const fields = {
                 name: name,
-                project: document.getElementById('td-field-project').value,
+                project: projectId,
                 desc: document.getElementById('td-field-desc').value,
                 assigned: document.getElementById('td-field-assigned').value,
                 priority: document.getElementById('td-field-priority').value,

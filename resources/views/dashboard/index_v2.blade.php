@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard — BuildScape CMS')
+@section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
 
 @section('content')

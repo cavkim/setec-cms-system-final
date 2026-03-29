@@ -1,4 +1,3 @@
-{{-- CREATE PROJECT POPUP --}}
 <div class="popup-overlay" id="create-popup" onclick="if(event.target===this)closeCreatePopup()">
     <div class="popup-box">
 
@@ -104,7 +103,8 @@
                     style="padding:9px 22px;border-radius:8px;background:#1565C0;color:#fff;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:background .15s;display:flex;align-items:center;gap:7px"
                     id="create-submit-btn">
                     <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                        <path
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                     </svg>
                     Create Project
                 </button>
@@ -114,7 +114,7 @@
     </div>
 </div>
 
-{{-- EDIT PROJECT POPUP --}}
+
 <div class="popup-overlay" id="edit-popup" onclick="if(event.target===this)closeEditPopup()">
     <div class="popup-box">
 
@@ -122,7 +122,8 @@
             <div
                 style="width:34px;height:34px;border-radius:9px;background:rgba(0,137,123,.2);border:1px solid rgba(77,182,172,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="#4DB6AC">
-                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    <path
+                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                 </svg>
             </div>
             <div>
@@ -208,7 +209,8 @@
                 <button type="submit"
                     style="padding:9px 22px;border-radius:8px;background:#00897B;color:#fff;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px">
                     <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                        <path
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
                     </svg>
                     Save Changes
                 </button>
@@ -218,7 +220,7 @@
     </div>
 </div>
 
-{{-- DELETE CONFIRM POPUP --}}
+
 <div class="popup-overlay" id="delete-popup" onclick="if(event.target===this)closeDeletePopup()">
     <div class="popup-box" style="width:420px">
         <div class="popup-head">
@@ -263,4 +265,3 @@
         </div>
     </div>
 </div>
-

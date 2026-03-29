@@ -1,4 +1,4 @@
-@extends('layouts.app')
+<!-- @extends('layouts.app')
 @section('title', 'Dashboard — BuildScape CMS')
 @section('page-title', 'Dashboard')
 
@@ -375,4 +375,4 @@ function allProjectsHTML() {
     return `All projects list`;
 }
 </script>
-@endsection
+@endsection -->

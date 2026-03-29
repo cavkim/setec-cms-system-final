@@ -9,5 +9,8 @@ class BudgetCategory extends Model
     protected $fillable = [
         'category_name',
         'color_hex',
+        'description',
+        'is_active',
     ];
 }
+

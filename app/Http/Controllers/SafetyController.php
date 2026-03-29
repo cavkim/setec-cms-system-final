@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\SafetyIncident;
 
 class SafetyController extends Controller
 {
+    // use AuthorizesRequests;
     public function index(Request $request)
     {
         $query = DB::table('safety_incidents')
@@ -39,7 +41,7 @@ class SafetyController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', SafetyIncident::class);
+        abort_unless(auth()->user()->can('create incidents'), 403);
 
         $request->validate([
             'description' => 'required|string',
@@ -64,7 +66,7 @@ class SafetyController extends Controller
     public function update(Request $request, $id)
     {
         $incident = SafetyIncident::findOrFail($id);
-        $this->authorize('resolve', $incident);
+        abort_unless(auth()->user()->can('resolve incidents'), 403);
 
         $request->validate([
             'status' => 'required|in:open,investigating,resolved,closed',

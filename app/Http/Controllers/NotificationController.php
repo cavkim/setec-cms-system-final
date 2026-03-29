@@ -37,7 +37,7 @@ class NotificationController extends Controller
             ];
         }
 
-        return view('notifications.index', compact('notifications', 'stats', 'hasColumns'));
+        return view('notifications.notification-page', compact('notifications', 'stats', 'hasColumns'));
     }
 
     public function readAll(Request $request)

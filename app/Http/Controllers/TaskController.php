@@ -11,6 +11,7 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
+        // Get task IDs and metadata via query builder
         $query = DB::table('tasks')
             ->join('projects', 'projects.id', '=', 'tasks.project_id')
             ->leftJoin('users', 'users.id', '=', 'tasks.assigned_to')
@@ -30,8 +31,15 @@ class TaskController extends Controller
                 'users.name as assignee'
             );
 
-        if ($request->status && $request->status !== 'all')
+        // if ($request->status && $request->status !== 'all')
+        //     $query->where('tasks.status', $request->status);
+
+        // With this:
+        if ($request->status === 'high_priority') {
+            $query->where('tasks.priority', 'high');
+        } elseif ($request->status && $request->status !== 'all') {
             $query->where('tasks.status', $request->status);
+        }
         if ($request->priority && $request->priority !== 'all')
             $query->where('tasks.priority', $request->priority);
         if ($request->search)
@@ -40,10 +48,21 @@ class TaskController extends Controller
                     ->orWhere('projects.project_name', 'like', '%' . $request->search . '%');
             });
 
-        $tasks = $query
+        $paginated = $query
             ->orderByRaw("FIELD(tasks.status,'in_progress','pending','completed','cancelled')")
             ->orderByRaw("FIELD(tasks.priority,'high','medium','low')")
             ->paginate(12);
+
+        // Load actual Task models for authorization - just for the current page
+        $taskIds = $paginated->pluck('id')->toArray();
+        $taskModels = Task::whereIn('id', $taskIds)->get()->keyBy('id');
+
+        // Add models to each item in the paginated collection
+        foreach ($paginated->items() as $item) {
+            $item->_model = $taskModels[$item->id] ?? null;
+        }
+
+        $tasks = $paginated;
 
         $stats = [
             'total' => DB::table('tasks')->count(),
@@ -60,15 +79,16 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize('create', Task::class);
-
         $request->validate([
             'task_name' => 'required|string|max:200',
             'project_id' => 'required|exists:projects,id',
             'priority' => 'required|in:low,medium,high',
-            'status' => 'required|in:pending,in_progress,completed,cancelled',
+            // 'status' => 'required|in:pending,in_progress,completed,cancelled',
+            'status' => 'required|in:pending,in_progress,completed,blocked,cancelled',
             'due_date' => 'nullable|date',
             'assigned_to' => 'nullable|exists:users,id',
+            'description' => 'nullable|string|max:1000',
+            'progress_percent' => 'nullable|integer|min:0|max:100',
         ]);
 
         Task::create([
@@ -79,7 +99,7 @@ class TaskController extends Controller
             'due_date' => $request->due_date ?: null,
             'assigned_to' => $request->assigned_to ?: null,
             'description' => $request->description,
-            'progress_percent' => 0,
+            'progress_percent' => $request->progress_percent ?? 0,
         ]);
 
         return redirect()->route('tasks.index')->with('success', 'Task created!');
@@ -87,12 +107,15 @@ class TaskController extends Controller
 
     public function update(Request $request, Task $task)
     {
-        $this->authorize('update', $task);
-
         $request->validate([
             'task_name' => 'required|string|max:200',
+            'project_id' => 'required|exists:projects,id',
             'priority' => 'required|in:low,medium,high',
-            'status' => 'required|in:pending,in_progress,completed,cancelled',
+            'status' => 'required|in:pending,in_progress,completed,blocked,cancelled',
+            'due_date' => 'nullable|date',
+            'assigned_to' => 'nullable|exists:users,id',
+            'description' => 'nullable|string|max:1000',
+            'progress_percent' => 'nullable|integer|min:0|max:100',
         ]);
 
         $task->update([
@@ -111,8 +134,6 @@ class TaskController extends Controller
 
     public function destroy(Task $task)
     {
-        $this->authorize('delete', $task);
-
         $task->delete();
         return redirect()->route('tasks.index')->with('success', 'Task deleted.');
     }

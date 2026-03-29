@@ -8,14 +8,17 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\BudgetCategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\SafetyController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 // ── AUTH ROUTES (Breeze handles these) ────────────────────
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // ── PROTECTED ROUTES ──────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -65,13 +68,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('team/{id}', [TeamController::class, 'destroy'])->name('team.destroy')
         ->middleware('permission:delete team');
 
+    // User Management (admin only)
+    Route::middleware('role:super_admin|admin')->group(function () {
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
+        Route::put('users/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::post('users/{id}/avatar', [UserController::class, 'uploadAvatar'])->name('users.avatar');
+    });
+
+
+
+
+    // Role Management (super_admin only)
+    Route::middleware('role:super_admin|admin')->group(function () {
+        Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
+        Route::post('roles', [RoleController::class, 'store'])->name('roles.store');
+        Route::put('roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+        Route::delete('roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    });
+
+
     // Budget
     Route::middleware('permission:view budget')->group(function () {
         Route::get('budget', [BudgetController::class, 'index'])->name('budget.index');
+        Route::get('budget/categories', [BudgetCategoryController::class, 'index'])->name('budget.categories.index');
+        Route::post('budget/categories', [BudgetCategoryController::class, 'store'])->name('budget.categories.store')
+            ->middleware('role:super_admin|admin|project_manager');
+        Route::put('budget/categories/{category}', [BudgetCategoryController::class, 'update'])->name('budget.categories.update')
+            ->middleware('role:super_admin|admin|project_manager');
+        Route::delete('budget/categories/{category}', [BudgetCategoryController::class, 'destroy'])->name('budget.categories.destroy')
+            ->middleware('role:super_admin|admin|project_manager');
+        Route::post('budget/categories/api/create', [BudgetCategoryController::class, 'apiCreate'])->name('budget.categories.api')
+            ->middleware('role:super_admin|admin|project_manager');
     });
     Route::post('budget/expenses', [BudgetController::class, 'storeExpense'])->name('budget.store')
         ->middleware('permission:create expenses');
     Route::patch('budget/expenses/{id}/approve', [BudgetController::class, 'approveExpense'])->name('budget.approve')
+        ->middleware('permission:approve expenses');
+    Route::patch('budget/expenses/{id}/reject', [BudgetController::class, 'rejectExpense'])->name('budget.reject')
         ->middleware('permission:approve expenses');
 
     // Documents
