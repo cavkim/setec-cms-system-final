@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // ADD THIS LINE ↓
+    Route::put('/password', [\App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('password.update');
+
     // Dashboard — all authenticated users
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard')
         ->middleware('permission:view dashboard');

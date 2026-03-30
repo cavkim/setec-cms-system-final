@@ -158,7 +158,7 @@
                                             <span
                                                 class="text-sm font-semibold text-[#dae2fd]">{{ $log->causer_name ?? 'System' }}</span>
                                             <span
-                                                class="text-[10px] text-[#c2c6d6]">{{ ucfirst(auth()->user()->getRoleNames()->first() ?? 'user') }}</span>
+                                                class="text-[10px] text-[#c2c6d6]">{{ $log->causer_name ? 'user' : 'system' }}</span>
                                         </div>
                                     </div>
                                 </td>

@@ -18,6 +18,7 @@ class ProfileController extends Controller
     {
         return view('profile.profile-page', [
             'user' => $request->user(),
+            'roles' => \Spatie\Permission\Models\Role::all(), // ADD THIS
         ]);
     }
 
