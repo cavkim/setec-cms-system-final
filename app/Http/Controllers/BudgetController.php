@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
+use App\Notifications\BudgetAlertNotification;
+use App\Notifications\ExpenseStatusNotification;
 
 class BudgetController extends Controller
 {
@@ -117,8 +120,6 @@ class BudgetController extends Controller
             'notes' => $request->notes,
             'created_at' => now(),
             'updated_at' => now(),
-
-
         ]);
 
         $total = DB::table('expenses')
@@ -128,9 +129,21 @@ class BudgetController extends Controller
         DB::table('projects')->where('id', $request->project_id)
             ->update(['budget_spent' => $total, 'updated_at' => now()]);
 
+        // Notify admins and project managers
+        $project = DB::table('projects')->where('id', $request->project_id)->first();
+        $admins = User::role(['admin', 'super_admin', 'project_manager'])->get();
+        foreach ($admins as $admin) {
+            if ($admin->id !== auth()->id()) {
+                $admin->notify(new BudgetAlertNotification(
+                    $project->project_name,
+                    'submitted',
+                    $request->amount
+                ));
+            }
+        }
+
         return redirect()->route('budget.index')->with('success', 'Expense added!');
     }
-
 
     public function approveExpense(Request $request, $id)
     {
@@ -153,6 +166,16 @@ class BudgetController extends Controller
             DB::table('projects')->where('id', $expense->project_id)
                 ->update(['budget_spent' => $total, 'updated_at' => now()]);
         });
+
+        // Notify submitter
+        $expense = DB::table('expenses')->where('id', $id)->first();
+        $project = DB::table('projects')->where('id', $expense->project_id)->first();
+        $submitter = User::find($expense->submitted_by);
+        $submitter?->notify(new ExpenseStatusNotification(
+            'approved',
+            $expense->amount,
+            $project->project_name
+        ));
 
         return redirect()->route('budget.index')->with('success', 'Expense approved!');
     }
@@ -177,6 +200,16 @@ class BudgetController extends Controller
             DB::table('projects')->where('id', $expense->project_id)
                 ->update(['budget_spent' => $total, 'updated_at' => now()]);
         });
+
+        // Notify submitter
+        $expense = DB::table('expenses')->where('id', $id)->first();
+        $project = DB::table('projects')->where('id', $expense->project_id)->first();
+        $submitter = User::find($expense->submitted_by);
+        $submitter?->notify(new ExpenseStatusNotification(
+            'rejected',
+            $expense->amount,
+            $project->project_name
+        ));
 
         return redirect()->route('budget.index')->with('success', 'Expense rejected.');
     }

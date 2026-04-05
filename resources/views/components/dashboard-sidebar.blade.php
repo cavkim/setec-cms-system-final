@@ -1,100 +1,7 @@
-<!-- <aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#171f33] shadow-2xl z-50 overflow-y-auto">
-   <div class="px-4 py-5 flex items-center justify-center border-b border-white/10">
-    <img src="{{ asset('branding/logo.png') }}" alt="{{ config('app.name') }}" 
-         class="object-contain">
-</div>
-
-    <nav class="flex flex-col h-full py-2 space-y-1">
-        <a class="{{ request()->routeIs('dashboard') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('dashboard') }}">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span>
-            <span class="text-[0.875rem]">Dashboard</span>
-        </a>
-
-        <a class="{{ request()->routeIs('projects.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('projects.index') }}">
-            <span class="material-symbols-outlined">construction</span>
-            <span class="text-[0.875rem]">Projects</span>
-        </a>
-
-        <a class="{{ request()->routeIs('tasks.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('tasks.index') }}">
-            <span class="material-symbols-outlined">assignment</span>
-            <span class="text-[0.875rem]">Tasks</span>
-        </a>
-
-        <a class="{{ request()->routeIs('team.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('team.index') }}">
-            <span class="material-symbols-outlined">group</span>
-            <span class="text-[0.875rem]">Team</span>
-        </a>
-
-        <a class="{{ request()->routeIs('budget.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('budget.index') }}">
-            <span class="material-symbols-outlined">payments</span>
-            <span class="text-[0.875rem]">Budget</span>
-        </a>
-
-        <a class="{{ request()->routeIs('documents.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('documents.index') }}">
-            <span class="material-symbols-outlined">description</span>
-            <span class="text-[0.875rem]">Documents</span>
-        </a>
-
-        <a class="{{ request()->routeIs('safety.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('safety.index') }}">
-            <span class="material-symbols-outlined">engineering</span>
-            <span class="text-[0.875rem]">Safety</span>
-        </a>
-
-        <a class="{{ request()->routeIs('reports.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('reports.index') }}">
-            <span class="material-symbols-outlined">analytics</span>
-            <span class="text-[0.875rem]">Reports</span>
-        </a>
-
-        @hasrole('super_admin|admin')
-        <a class="{{ request()->routeIs('audit.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('audit.index') }}">
-            <span class="material-symbols-outlined">history</span>
-            <span class="text-[0.875rem]">Audit Log</span>
-        </a>
-        @endhasrole
-
-        <div class="mt-auto px-4 py-4 border-t border-white/5">
-            <button
-                class="w-full bg-[#4d8eff] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95"
-                onclick="typeof openCreatePopup === 'function' ? openCreatePopup() : toast('New project form coming soon','info')">
-                <span class="material-symbols-outlined">add</span>
-                New Project
-            </button>
-        </div>
-
-        <div class="mt-2">
-            <a class="{{ request()->routeIs('notifications.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-                href="{{ route('notifications.index') }}">
-                <span class="material-symbols-outlined">notifications</span>
-                <span class="text-[0.875rem]">Notifications</span>
-            </a>
-            <a class="text-slate-400 hover:bg-white/5 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-                href="#"
-                onclick="toast('Support coming soon','info'); return false;">
-                <span class="material-symbols-outlined">help</span>
-                <span class="text-[0.875rem]">Support</span>
-            </a>
-            <a class="{{ request()->routeIs('profile.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-                href="{{ route('profile.edit') }}">
-                <span class="material-symbols-outlined">settings</span>
-                <span class="text-[0.875rem]">Settings</span>
-            </a>
-        </div>
-    </nav>
-</aside> -->
-
 <aside id="sidebar"
     class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#171f33] shadow-2xl z-50 overflow-y-auto overflow-x-hidden transition-all duration-300">
 
-    {{-- Toggle button — floats on the right edge --}}
+    {{-- Toggle button --}}
     <button id="sidebar-toggle" onclick="toggleSidebar()" class="absolute -right-3.5 top-1/4 -translate-y-1/2 z-100
                w-7 h-7 rounded-full bg-[#171f33] border border-[#424754]/50
                flex items-center justify-center
@@ -107,40 +14,47 @@
     </button>
 
     <div class="px-4 py-5 flex items-center justify-center border-b border-white/10 min-h-[72px]">
-        <!-- <img src="{{ asset('branding/logo.png') }}" alt="{{ config('app.name') }}"
-             class="object-contain sidebar-logo transition-all duration-300"> -->
     </div>
 
     <nav class="flex flex-col h-full py-2 space-y-1">
 
-        <a class="{{ request()->routeIs('dashboard') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('dashboard') }}" title="Dashboard">
-            <span class="material-symbols-outlined flex-shrink-0"
-                style="font-variation-settings:'FILL' 1;">dashboard</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Dashboard</span>
-        </a>
+        @can('view dashboard')
+            <a class="{{ request()->routeIs('dashboard') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('dashboard') }}" title="Dashboard">
+                <span class="material-symbols-outlined flex-shrink-0"
+                    style="font-variation-settings:'FILL' 1;">dashboard</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Dashboard</span>
+            </a>
+        @endcan
 
-        <a class="{{ request()->routeIs('projects.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('projects.index') }}" title="Projects">
-            <span class="material-symbols-outlined flex-shrink-0">construction</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Projects</span>
-        </a>
+        @can('view projects')
+            <a class="{{ request()->routeIs('projects.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('projects.index') }}" title="Projects">
+                <span class="material-symbols-outlined flex-shrink-0">construction</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Projects</span>
+            </a>
+        @endcan
 
-        <a class="{{ request()->routeIs('tasks.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('tasks.index') }}" title="Tasks">
-            <span class="material-symbols-outlined flex-shrink-0">assignment</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Tasks</span>
-        </a>
+        @can('view tasks')
+            <a class="{{ request()->routeIs('tasks.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('tasks.index') }}" title="Tasks">
+                <span class="material-symbols-outlined flex-shrink-0">assignment</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Tasks</span>
+            </a>
+        @endcan
 
-        <a class="{{ request()->routeIs('team.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('team.index') }}" title="Team">
-            <span class="material-symbols-outlined flex-shrink-0">group</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Team</span>
-        </a>
+        @can('view team')
+            <a class="{{ request()->routeIs('team.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('team.index') }}" title="Team">
+                <span class="material-symbols-outlined flex-shrink-0">group</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Team</span>
+            </a>
+        @endcan
+
         @hasrole('super_admin|admin')
         <a class="{{ request()->routeIs('users.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
             href="{{ route('users.index') }}" title="User Management">
@@ -150,40 +64,50 @@
         </a>
         @endhasrole
 
+        @hasrole('super_admin|admin')
         <a class="{{ request()->routeIs('roles.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
             href="{{ route('roles.index') }}" title="Roles Management">
             <span class="material-symbols-outlined flex-shrink-0">security</span>
             <span
                 class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Roles</span>
         </a>
+        @endhasrole
 
-        <a class="{{ request()->routeIs('budget.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('budget.index') }}" title="Budget">
-            <span class="material-symbols-outlined flex-shrink-0">payments</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Budget</span>
-        </a>
+        @can('view budget')
+            <a class="{{ request()->routeIs('budget.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('budget.index') }}" title="Budget">
+                <span class="material-symbols-outlined flex-shrink-0">payments</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Budget</span>
+            </a>
+        @endcan
 
-        <a class="{{ request()->routeIs('documents.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('documents.index') }}" title="Documents">
-            <span class="material-symbols-outlined flex-shrink-0">description</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Documents</span>
-        </a>
+        @can('view documents')
+            <a class="{{ request()->routeIs('documents.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('documents.index') }}" title="Documents">
+                <span class="material-symbols-outlined flex-shrink-0">description</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Documents</span>
+            </a>
+        @endcan
 
-        <a class="{{ request()->routeIs('safety.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('safety.index') }}" title="Safety">
-            <span class="material-symbols-outlined flex-shrink-0">engineering</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Safety</span>
-        </a>
+        @can('view safety')
+            <a class="{{ request()->routeIs('safety.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('safety.index') }}" title="Safety">
+                <span class="material-symbols-outlined flex-shrink-0">engineering</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Safety</span>
+            </a>
+        @endcan
 
-        <a class="{{ request()->routeIs('reports.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-            href="{{ route('reports.index') }}" title="Reports">
-            <span class="material-symbols-outlined flex-shrink-0">analytics</span>
-            <span
-                class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Reports</span>
-        </a>
+        @can('view reports')
+            <a class="{{ request()->routeIs('reports.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('reports.index') }}" title="Reports">
+                <span class="material-symbols-outlined flex-shrink-0">analytics</span>
+                <span
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Reports</span>
+            </a>
+        @endcan
 
         @hasrole('super_admin|admin')
         <a class="{{ request()->routeIs('audit.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
@@ -195,23 +119,15 @@
         </a>
         @endhasrole
 
-        <!-- <div class="mt-auto px-2 py-4 border-t border-white/5">
-            <button
-                class="w-full bg-[#4d8eff] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95"
-                onclick="typeof openCreatePopup === 'function' ? openCreatePopup() : toast('New project form coming soon','info')"
-                title="New Project">
-                <span class="material-symbols-outlined flex-shrink-0">add</span>
-                <span class="sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">New Project</span>
-            </button>
-        </div> -->
-
         <div>
-            <a class="{{ request()->routeIs('notifications.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-                href="{{ route('notifications.index') }}" title="Notifications">
-                <span class="material-symbols-outlined flex-shrink-0">notifications</span>
-                <span
-                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Notifications</span>
-            </a>
+            @can('view notifications')
+                <a class="{{ request()->routeIs('notifications.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                    href="{{ route('notifications.index') }}" title="Notifications">
+                    <span class="material-symbols-outlined flex-shrink-0">notifications</span>
+                    <span
+                        class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Notifications</span>
+                </a>
+            @endcan
             <a class="text-slate-400 hover:bg-white/5 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
                 href="#" onclick="toast('Support coming soon','info'); return false;" title="Support">
                 <span class="material-symbols-outlined flex-shrink-0">help</span>
@@ -222,7 +138,8 @@
                 href="{{ route('profile.edit') }}" title="Settings">
                 <span class="material-symbols-outlined flex-shrink-0">settings</span>
                 <span
-                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Settings</span>
+                    class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">My
+                    Profile</span>
             </a>
         </div>
 

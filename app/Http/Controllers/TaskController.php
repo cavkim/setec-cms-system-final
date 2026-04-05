@@ -1,17 +1,17 @@
 <?php
-// app/Http/Controllers/TaskController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\TaskDeadlineNotification;
 
 class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        // Get task IDs and metadata via query builder
         $query = DB::table('tasks')
             ->join('projects', 'projects.id', '=', 'tasks.project_id')
             ->leftJoin('users', 'users.id', '=', 'tasks.assigned_to')
@@ -31,10 +31,6 @@ class TaskController extends Controller
                 'users.name as assignee'
             );
 
-        // if ($request->status && $request->status !== 'all')
-        //     $query->where('tasks.status', $request->status);
-
-        // With this:
         if ($request->status === 'high_priority') {
             $query->where('tasks.priority', 'high');
         } elseif ($request->status && $request->status !== 'all') {
@@ -53,11 +49,9 @@ class TaskController extends Controller
             ->orderByRaw("FIELD(tasks.priority,'high','medium','low')")
             ->paginate(12);
 
-        // Load actual Task models for authorization - just for the current page
         $taskIds = $paginated->pluck('id')->toArray();
         $taskModels = Task::whereIn('id', $taskIds)->get()->keyBy('id');
 
-        // Add models to each item in the paginated collection
         foreach ($paginated->items() as $item) {
             $item->_model = $taskModels[$item->id] ?? null;
         }
@@ -83,7 +77,6 @@ class TaskController extends Controller
             'task_name' => 'required|string|max:200',
             'project_id' => 'required|exists:projects,id',
             'priority' => 'required|in:low,medium,high',
-            // 'status' => 'required|in:pending,in_progress,completed,cancelled',
             'status' => 'required|in:pending,in_progress,completed,blocked,cancelled',
             'due_date' => 'nullable|date',
             'assigned_to' => 'nullable|exists:users,id',
@@ -102,11 +95,27 @@ class TaskController extends Controller
             'progress_percent' => $request->progress_percent ?? 0,
         ]);
 
+        // Notify assigned user
+        if ($request->assigned_to) {
+            $assignee = User::find($request->assigned_to);
+            $project = DB::table('projects')->where('id', $request->project_id)->first();
+            if ($assignee && $assignee->id !== auth()->id()) {
+                $assignee->notify(new TaskDeadlineNotification(
+                    $request->task_name,
+                    $project->project_name,
+                    $request->due_date ?? ''
+                ));
+            }
+        }
+
         return redirect()->route('tasks.index')->with('success', 'Task created!');
     }
 
     public function update(Request $request, Task $task)
     {
+        if (auth()->user()->hasRole('team_member')) {
+            abort_unless($task->assigned_to === auth()->id(), 403);
+        }
         $request->validate([
             'task_name' => 'required|string|max:200',
             'project_id' => 'required|exists:projects,id',
@@ -129,17 +138,34 @@ class TaskController extends Controller
             'progress_percent' => $request->progress_percent ?? $task->progress_percent,
         ]);
 
+        // Notify assigned user if reassigned
+        if ($request->assigned_to && $request->assigned_to != $task->assigned_to) {
+            $assignee = User::find($request->assigned_to);
+            $project = DB::table('projects')->where('id', $request->project_id)->first();
+            if ($assignee && $assignee->id !== auth()->id()) {
+                $assignee->notify(new TaskDeadlineNotification(
+                    $request->task_name,
+                    $project->project_name,
+                    $request->due_date ?? ''
+                ));
+            }
+        }
+
         return redirect()->route('tasks.index')->with('success', 'Task updated!');
     }
 
     public function destroy(Task $task)
     {
+        abort_unless(auth()->user()->can('delete tasks'), 403);
         $task->delete();
         return redirect()->route('tasks.index')->with('success', 'Task deleted.');
     }
 
     public function updateStatus(Request $request, Task $task)
     {
+        if (auth()->user()->hasRole('team_member')) {
+            abort_unless($task->assigned_to === auth()->id(), 403);
+        }
         $task->update(['status' => $request->status]);
         return response()->json(['ok' => true]);
     }

@@ -149,7 +149,6 @@ class RolePermissionSeeder extends Seeder
             'view safety',
             'create incidents',
             'resolve incidents',
-            'view reports',
             'view notifications',
         ]);
 

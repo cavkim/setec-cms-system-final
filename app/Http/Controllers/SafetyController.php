@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-// use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\SafetyIncident;
+use App\Models\User;
+use App\Notifications\SafetyIncidentNotification;
 
 class SafetyController extends Controller
 {
-    // use AuthorizesRequests;
     public function index(Request $request)
     {
         $query = DB::table('safety_incidents')
@@ -60,6 +60,18 @@ class SafetyController extends Controller
             'updated_at' => now(),
         ]);
 
+        // Notify admins and supervisors
+        $admins = User::role(['admin', 'super_admin', 'site_supervisor'])->get();
+        foreach ($admins as $admin) {
+            if ($admin->id !== auth()->id()) {
+                $admin->notify(new SafetyIncidentNotification(
+                    $request->description,
+                    $request->severity,
+                    $request->location ?? ''
+                ));
+            }
+        }
+
         return redirect()->route('safety.index')->with('success', 'Incident reported!');
     }
 
@@ -77,7 +89,16 @@ class SafetyController extends Controller
             'updated_at' => now(),
         ]);
 
+        // Notify reporter when resolved
+        if (in_array($request->status, ['resolved', 'closed'])) {
+            $reporter = User::find($incident->reported_by);
+            $reporter?->notify(new SafetyIncidentNotification(
+                $incident->description,
+                $incident->severity,
+                $incident->location ?? ''
+            ));
+        }
+
         return redirect()->route('safety.index')->with('success', 'Incident updated!');
     }
 }
-

@@ -1,25 +1,197 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<!DOCTYPE html>
+<html class="dark" lang="en">
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CMS — Forgot Password</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#adc6ff",
+                        "on-surface-variant": "#c2c6d6",
+                        "secondary": "#ffb95f",
+                        "surface": "#0b1326",
+                        "surface-variant": "#2d3449",
+                        "surface-container-low": "#131b2e",
+                        "error": "#ffb4ab",
+                        "on-primary": "#002e6a",
+                        "outline": "#8c909f",
+                        "outline-variant": "#424754",
+                        "on-background": "#dae2fd",
+                        "background": "#0b1326",
+                        "on-surface": "#dae2fd",
+                        "surface-container": "#171f33",
+                        "primary-container": "#4d8eff",
+                        "surface-container-lowest": "#060e20",
+                        "surface-container-highest": "#2d3449",
+                        "surface-container-high": "#222a3d",
+                        "surface-dim": "#0b1326",
+                        "error-container": "#93000a"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
+        .glass-panel {
+            background: rgba(45, 52, 73, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        .tectonic-bg {
+            background-image: radial-gradient(circle at 2px 2px, rgba(140, 144, 159, 0.05) 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body antialiased overflow-hidden">
+
+    {{-- ── TOP NAV ── --}}
+    <nav
+        class="fixed top-0 w-full bg-[#0b1326] flex justify-between items-center px-8 py-4 z-50 bg-gradient-to-b from-[#171f33] to-transparent">
+        <div class="text-xl font-bold tracking-tight text-slate-100 font-headline">CMS</div>
+        <div class="flex items-center gap-6 text-sm font-medium tracking-wide">
+            <button class="text-slate-400 hover:text-blue-300 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">help</span>
+                <span>Help</span>
+            </button>
+            <button class="text-slate-400 hover:text-blue-300 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">language</span>
+                <span>Region</span>
+            </button>
+        </div>
+    </nav>
+
+    {{-- ── MAIN ── --}}
+    <main class="relative min-h-screen flex items-center justify-center p-6 tectonic-bg">
+
+        {{-- Background blobs --}}
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <div class="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+            <div class="absolute top-[60%] -right-[5%] w-[30%] h-[30%] bg-secondary/5 blur-[100px] rounded-full"></div>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
+        <div class="relative w-full max-w-md z-10">
+
+            {{-- ── BRANDING ── --}}
+            <div class="text-center mb-10">
+                <div
+                    class="inline-flex items-center justify-center p-4 rounded-xl bg-surface-container-high mb-6 shadow-2xl">
+                    <span class="material-symbols-outlined text-primary text-4xl"
+                        style="font-variation-settings:'FILL' 1;">lock_reset</span>
+                </div>
+                <h1 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">
+                    Reset Password
+                </h1>
+                <p class="text-on-surface-variant font-body text-sm leading-relaxed max-w-sm mx-auto">
+                    Forgot your password? No problem. Enter your email and we'll send you a reset link.
+                </p>
+            </div>
+
+            {{-- ── CARD ── --}}
+            <div
+                class="glass-panel border border-outline-variant/15 rounded-xl p-8 shadow-[0px_8px_24px_rgba(6,14,32,0.4)]">
+
+                {{-- Session status (reset link sent confirmation) --}}
+                @if(session('status'))
+                    <div class="mb-6 p-4 rounded-xl bg-primary/10 border border-primary/20
+                                text-primary text-sm font-medium flex items-center gap-3">
+                        <span class="material-symbols-outlined text-base"
+                            style="font-variation-settings:'FILL' 1;">check_circle</span>
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
+                    @csrf
+
+                    {{-- Email --}}
+                    <div class="space-y-2">
+                        <label
+                            class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold"
+                            for="email">Email Address</label>
+                        <div class="relative group">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined
+                                         text-on-surface-variant group-focus-within:text-primary transition-colors">
+                                alternate_email
+                            </span>
+                            <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
+                                autocomplete="email" placeholder="name@company.com" class="w-full bg-surface-container-lowest border-0 rounded-xl py-3.5 pl-12 pr-4
+                                          text-on-surface placeholder:text-outline/50
+                                          ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary
+                                          transition-all duration-200 outline-none
+                                          {{ $errors->get('email') ? 'ring-error/60' : '' }}" />
+                        </div>
+                        @error('email')
+                            <p class="text-xs text-error flex items-center gap-1.5 ml-1">
+                                <span class="material-symbols-outlined text-sm">error</span>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Submit --}}
+                    <button type="submit"
+                        class="w-full py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary
+                                   font-headline font-bold text-sm tracking-widest uppercase rounded-xl
+                                   shadow-lg shadow-primary/20 hover:shadow-primary/30
+                                   transition-all active:scale-[0.98] duration-200 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-base">send</span>
+                        Email Password Reset Link
+                    </button>
+
+                </form>
+
+                {{-- Back to login --}}
+                <div class="mt-6 text-center">
+                    <a href="{{ route('login') }}"
+                        class="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1.5">
+                        <span class="material-symbols-outlined text-base">arrow_back</span>
+                        Back to Sign In
+                    </a>
+                </div>
+
+            </div>
+
         </div>
-    </form>
-</x-guest-layout>
+    </main>
+
+    {{-- ── FOOTER ── --}}
+    <footer class="fixed bottom-0 w-full flex flex-col md:flex-row justify-between items-center
+                   px-12 py-6 text-[10px] uppercase tracking-widest text-slate-500
+                   opacity-80 hover:opacity-100 transition-opacity bg-transparent">
+        <div class="mb-4 md:mb-0">© {{ date('Y') }} CMS. High-Precision Industrial Grade.</div>
+        <div class="flex gap-8">
+            <a class="hover:text-blue-400 transition-colors" href="#">Privacy Policy</a>
+            <a class="hover:text-blue-400 transition-colors" href="#">Terms of Service</a>
+            <a class="hover:text-blue-400 transition-colors" href="#">Security</a>
+            <a class="hover:text-blue-400 transition-colors" href="#">Support</a>
+        </div>
+    </footer>
+
+</body>
+
+</html>

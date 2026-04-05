@@ -9,6 +9,13 @@ class SafetyIncidentNotification extends Notification
 {
     use Queueable;
 
+    public function __construct(
+        public string $description,
+        public string $severity,
+        public string $location = ''
+    ) {
+    }
+
     public function via(object $notifiable): array
     {
         return ['database'];
@@ -16,6 +23,10 @@ class SafetyIncidentNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
-        return ['message' => 'New safety incident reported.'];
+        return [
+            'message' => 'New safety incident reported',
+            'body' => ucfirst($this->severity) . ' incident: ' . \Illuminate\Support\Str::limit($this->description, 60),
+            'type' => 'safety',
+        ];
     }
 }

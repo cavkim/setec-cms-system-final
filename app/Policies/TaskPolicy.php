@@ -28,6 +28,9 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
+        if ($user->hasRole('team_member')) {
+            return $task->assigned_to === $user->id;
+        }
         return $user->hasPermissionTo('edit tasks');
     }
 

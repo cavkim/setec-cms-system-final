@@ -5,14 +5,14 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class TaskDeadlineNotification extends Notification
+class ExpenseStatusNotification extends Notification
 {
     use Queueable;
 
     public function __construct(
-        public string $taskName,
-        public string $projectName,
-        public string $dueDate = ''
+        public string $status,
+        public float $amount,
+        public string $projectName
     ) {
     }
 
@@ -24,9 +24,9 @@ class TaskDeadlineNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'message' => 'Task assigned: ' . $this->taskName,
-            'body' => 'Project: ' . $this->projectName . ($this->dueDate ? ' · Due: ' . $this->dueDate : ''),
-            'type' => 'project',
+            'message' => 'Expense ' . $this->status . ' — $' . number_format($this->amount),
+            'body' => 'Project: ' . $this->projectName,
+            'type' => 'budget',
         ];
     }
 }

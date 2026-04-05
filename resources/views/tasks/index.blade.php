@@ -160,8 +160,16 @@
                          ondrop="kanbanDrop(event)">
                         @foreach($tasks->filter(fn($t) => $t->status === $status) as $t)
                             <div
-                                class="kanban-card bg-surface-container-high p-4 rounded-xl border border-white/5 hover:border-primary/30 transition-all select-none {{ $t->status === 'completed' ? 'opacity-60' : '' }}"
-                                draggable="true"
+                               class="kanban-card bg-surface-container-high p-4 rounded-xl border border-white/5 hover:border-primary/30 transition-all select-none {{ $t->status === 'completed' ? 'opacity-60' : '' }}"
+                                @if(auth()->user()->hasRole('team_member'))
+                                    @if($t->assigned_to === auth()->id())
+                                        draggable="true"
+                                    @else
+                                        draggable="false"
+                                    @endif
+                                @else
+                                    draggable="true"
+                                @endif
                                 data-task-id="{{ $t->id }}"
                                 data-status="{{ $t->status }}"
                                 ondragstart="kanbanDragStart(event)">
