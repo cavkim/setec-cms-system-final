@@ -212,10 +212,10 @@
                 </table>
             </div>
 
-            <div class="px-6 py-4 bg-surface-container-low/50 border-t border-white/5 flex items-center justify-between">
+            <div class="px-6 py-4 bg-surface-container-low/50 border-t border-white/5 flex items-center justify-start gap-4">
                 <p class="text-xs text-on-surface-variant">Showing {{ $projects->firstItem() }}–{{ $projects->lastItem() }}
                     of {{ $projects->total() }} projects</p>
-                <div class="flex gap-2">
+                <div class="flex gap-2 ">
                     @if ($projects->onFirstPage())
                         <span
                             class="px-3 py-1 text-xs font-bold bg-surface-container-highest text-on-surface-variant rounded-md opacity-60">Previous</span>
