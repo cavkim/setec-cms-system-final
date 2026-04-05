@@ -31,7 +31,7 @@ class ProjectController extends Controller
             });
         }
 
-        $projects = $query->orderByDesc('updated_at')->paginate(10);
+        $projects = $query->orderByDesc('updated_at')->paginate(10)->appends($request->query());
 
         $stats = [
             'total' => DB::table('projects')->count(),
