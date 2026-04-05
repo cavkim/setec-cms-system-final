@@ -227,7 +227,7 @@
                 </table>
             </div>
             @if($expenses instanceof \Illuminate\Pagination\LengthAwarePaginator && $expenses->hasPages())
-                <div class="px-6 py-4 bg-surface-container-high/30 border-t border-white/5 flex justify-between items-center">
+                <div class="px-6 py-4 bg-surface-container-high/30 border-t border-white/5 flex justify-start items-center gap-4">
                     <p class="text-xs text-on-surface-variant">Showing {{ $expenses->firstItem() }}–{{ $expenses->lastItem() }} of
                         {{ $expenses->total() }}</p>
                     <div class="flex gap-2">
@@ -405,7 +405,7 @@
                     <form id="reject-form-{{ $exp->id }}" method="POST" action="{{ route('budget.reject', $exp->id) }}">@csrf
                         @method('PATCH')</form>
 
-                        
+
                 @endif
             @endforeach
         </div>

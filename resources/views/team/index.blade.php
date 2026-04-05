@@ -53,7 +53,7 @@
             </div>
         </div>
     @endif
-  
+
 
     {{-- Stats --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
@@ -242,7 +242,7 @@
             </table>
         </div>
         @if($members->hasPages())
-            <div class="px-6 py-4 bg-surface-container-high/30 border-t border-white/5 flex items-center justify-between">
+            <div class="px-6 py-4 bg-surface-container-high/30 border-t border-white/5 flex items-center justify-start gap-4">
                 <p class="text-xs text-on-surface-variant">Showing {{ $members->firstItem() }}–{{ $members->lastItem() }} of
                     {{ $members->total() }} members</p>
                 <div class="flex gap-2">

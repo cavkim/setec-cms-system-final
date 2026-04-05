@@ -67,7 +67,7 @@
 
     {{-- Header --}}
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        
+
         <div class="flex flex-wrap items-center gap-3">
             <div class="bg-surface-container rounded-xl flex p-1">
                 <a href="{{ route('tasks.index', array_merge(request()->query(), ['view' => 'list'])) }}"
@@ -314,7 +314,7 @@
 
             {{-- Pagination --}}
             @if($tasks->hasPages())
-                <div class="px-6 py-4 bg-surface-container-high/50 border-t border-white/5 flex items-center justify-between">
+                <div class="px-6 py-4 bg-surface-container-high/50 border-t border-white/5 flex items-center justify-start gap-4">
                     <p class="text-xs text-on-surface-variant">Showing {{ $tasks->firstItem() }}–{{ $tasks->lastItem() }} of
                         {{ $tasks->total() }} tasks</p>
                     <div class="flex gap-2">
