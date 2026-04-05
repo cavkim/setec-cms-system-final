@@ -74,7 +74,7 @@
         <div class="al al-b" id="alert-cert-{{ $i }}">
             <div class="al-dot" style="background:var(--sky)"></div>
             <div style="flex:1">
-                <div class="al-title">Certification expiring — {{ $member->name }} in {{ \Carbon\Carbon::parse($member->certification_expiry)->diffInDays() }} days</div>
+                <div class="al-title">Certification expiring — {{ $member->name }} in {{ ceil(\Carbon\Carbon::parse($member->certification_expiry)->diffInDays()) }} days</div>
                 <div class="al-desc">{{ $member->certification_number }} expires {{ \Carbon\Carbon::parse($member->certification_expiry)->format('M d, Y') }}</div>
             </div>
             <div class="al-x" onclick="dismissAlert('alert-cert-{{ $i }}')">×</div>

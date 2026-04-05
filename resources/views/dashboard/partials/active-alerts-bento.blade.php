@@ -57,7 +57,7 @@
                             <span class="material-symbols-outlined text-sm text-tertiary"
                                 style="font-variation-settings:'FILL' 1;">badge</span>
                             <span>Certification expiring — {{ $member->name }} in
-                                {{ \Carbon\Carbon::parse($member->certification_expiry)->diffInDays() }} days</span>
+                                {{ ceil(\Carbon\Carbon::parse($member->certification_expiry)->diffInDays()) }} days</span>
                         </div>
                         <div class="al-desc">
                             {{ $member->certification_number }} expires
