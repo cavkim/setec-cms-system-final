@@ -5,7 +5,7 @@
     </div>
 
     <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-[#171f33] rounded-xl px-4 py-2 border border-white/5">
+        <div class="hidden items-center gap-2 bg-[#171f33] rounded-xl px-4 py-2 border border-white/5">
             <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
             <input class="bg-transparent border-none text-sm text-white focus:ring-0 w-48 outline-none"
                 placeholder="Search projects..." type="text" />

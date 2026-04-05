@@ -11,28 +11,9 @@
     <div class="  mx-auto">
         {{-- Header Section --}}
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
-
-
-            <div class="flex gap-2 p-1 bg-surface-container-low rounded-xl">
-                @php
-                    $currentStatus = request('status', 'all');
-                @endphp
-                <a class="px-6 py-2 {{ $currentStatus === 'all' ? 'bg-surface-container-highest text-primary' : 'text-slate-400 hover:text-on-surface' }} font-semibold rounded-lg text-sm transition-all"
-                    href="{{ route('projects.index', ['status' => 'all', 'search' => request('search')]) }}">
-                    All
-                </a>
-                <a class="px-6 py-2 {{ $currentStatus === 'in_progress' ? 'bg-surface-container-highest text-primary' : 'text-slate-400 hover:text-on-surface' }} font-semibold rounded-lg text-sm transition-all"
-                    href="{{ route('projects.index', ['status' => 'in_progress', 'search' => request('search')]) }}">
-                    Active
-                </a>
-                <a class="px-6 py-2 {{ $currentStatus === 'on_hold' ? 'bg-surface-container-highest text-primary' : 'text-slate-400 hover:text-on-surface' }} font-semibold rounded-lg text-sm transition-all"
-                    href="{{ route('projects.index', ['status' => 'on_hold', 'search' => request('search')]) }}">
-                    On Hold
-                </a>
-                <a class="px-6 py-2 {{ $currentStatus === 'planning' ? 'bg-surface-container-highest text-primary' : 'text-slate-400 hover:text-on-surface' }} font-semibold rounded-lg text-sm transition-all"
-                    href="{{ route('projects.index', ['status' => 'planning', 'search' => request('search')]) }}">
-                    Planning
-                </a>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Projects</h1>
+                <p class="text-slate-400 text-sm mt-1">Manage and track all your construction projects</p>
             </div>
         </div>
 
@@ -75,21 +56,29 @@
             </div>
         </div>
 
-        <div class="bg-surface-container rounded-2xl overflow-hidden shadow-2xl mb-6">
-            <div class="p-6 flex items-center gap-4 flex-wrap">
-                <div class="flex-1 min-w-[220px]">
-                    <div
-                        class="flex items-center gap-3 bg-surface-container-low rounded-xl border border-outline-variant/20 px-4 py-2">
-                        <span class="material-symbols-outlined text-outline text-sm"
-                            style="font-variation-settings:'FILL' 1;">search</span>
-                        <form method="GET" action="{{ route('projects.index') }}" class="flex-1">
-                            <input type="hidden" name="status" value="{{ request('status', 'all') }}">
-                            <input
-                                class="bg-transparent border-none text-xs text-on-surface focus:ring-0 w-full placeholder:text-slate-500"
-                                placeholder="Search projects..." type="text" name="search" value="{{ request('search') }}">
-                        </form>
-                    </div>
-                </div>
+        <div class="bg-surface-container-low rounded-2xl p-5 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto">
+                @php
+                    $currentStatus = request('status', 'all');
+                @endphp
+                @foreach(['all' => 'All Projects', 'in_progress' => 'Active', 'on_hold' => 'On Hold', 'planning' => 'Planning', 'completed' => 'Completed'] as $v => $l)
+                    <a href="{{ route('projects.index', ['status' => $v, 'search' => request('search')]) }}"
+                        class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors
+                              {{ $currentStatus === $v ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface' }}">
+                        {{ $l }}
+                    </a>
+                @endforeach
+            </div>
+            <div class="relative w-full md:w-80">
+                <form method="GET" action="{{ route('projects.index') }}">
+                    <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+                    <input
+                        class="w-full bg-surface-container-lowest rounded-xl py-2.5 pl-11 pr-4 text-sm text-on-surface
+                              placeholder:text-on-surface-variant border border-white/5 focus:border-primary focus:outline-none transition-all"
+                        placeholder="Search projects..." type="text" name="search" value="{{ request('search') }}"
+                        oninput="clearTimeout(window._st);window._st=setTimeout(()=>this.form.submit(),450)">
+                </form>
             </div>
         </div>
 
