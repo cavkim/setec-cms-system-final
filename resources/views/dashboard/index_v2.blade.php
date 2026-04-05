@@ -23,14 +23,13 @@
         </div>
     </section>
 
-    <button
-        class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-[#4d8eff] text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform z-50"
-        onclick="toast('New project form coming soon','info')">
-        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">add</span>
-    </button>
+    <!-- <button
+            class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-[#4d8eff] text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform z-50"
+            onclick="toast('New project form coming soon','info')">
+            <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">add</span>
+        </button> -->
 @endsection
 
 @section('scripts')
     @include('dashboard.partials.dashboard-scripts')
 @endsection
-

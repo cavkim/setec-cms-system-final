@@ -29,17 +29,17 @@
                 <span class="material-symbols-outlined">notifications</span>
                 @if($topbarUnread > 0)
                     <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1
-                                 bg-[#ffb95f] text-[#2a1700] text-[9px] font-black
-                                 rounded-full flex items-center justify-center leading-none">
+                                     bg-[#ffb95f] text-[#2a1700] text-[9px] font-black
+                                     rounded-full flex items-center justify-center leading-none">
                         {{ $topbarUnread > 99 ? '99+' : $topbarUnread }}
                     </span>
                 @endif
             </button>
             {{-- Settings / Profile --}}
-            <a class="w-10 h-10 flex items-center justify-center rounded-xl bg-[#222a3d] text-[#dae2fd] hover:bg-[#2d3449] transition-colors"
+            <!-- <a class="w-10 h-10 flex items-center justify-center rounded-xl bg-[#222a3d] text-[#dae2fd] hover:bg-[#2d3449] transition-colors"
                 title="Settings & Profile" aria-label="Settings">
                 <span class="material-symbols-outlined">settings</span>
-            </a>
+            </a> -->
 
             <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#adc6ff]/20 cursor-pointer hover:border-[#adc6ff]/50 transition-all"
                 onclick="openUserDrawer()" title="My Account">

@@ -407,19 +407,19 @@
 
     {{-- Floating Action Button --}}
     @can('create projects')
-        <div class="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-3 group">
+        <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3 group">
             {{-- Tooltip label --}}
             <span
                 class="pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0
-                                                                                                                                        bg-surface-container-highest text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap border border-white/10 self-end mr-1">
+                                                                                                                                                                        bg-surface-container-highest text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap border border-white/10 self-end mr-1">
                 New Project
             </span>
 
             <button onclick="openCreateDrawer()"
                 class="w-14 h-14 rounded-full bg-primary text-on-primary shadow-[0_4px_24px_rgba(77,142,255,0.45)]
-                                                                                                                                               flex items-center justify-center
-                                                                                                                                               hover:scale-110 hover:shadow-[0_6px_32px_rgba(77,142,255,0.6)]
-                                                                                                                                               active:scale-95 transition-all duration-200"
+                                                                                                                                                                               flex items-center justify-center
+                                                                                                                                                                               hover:scale-110 hover:shadow-[0_6px_32px_rgba(77,142,255,0.6)]
+                                                                                                                                                                               active:scale-95 transition-all duration-200"
                 aria-label="Add new project">
                 <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">add</span>
             </button>

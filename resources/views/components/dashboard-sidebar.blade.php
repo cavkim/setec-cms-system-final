@@ -1,19 +1,10 @@
 <aside id="sidebar"
-    class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#171f33] shadow-2xl z-50 overflow-y-auto overflow-x-hidden transition-all duration-300">
-
+    class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#171f33] shadow-2xl z-50 overflow-y-auto transition-all duration-300">
     {{-- Toggle button --}}
-    <button id="sidebar-toggle" onclick="toggleSidebar()" class="absolute -right-3.5 top-1/4 -translate-y-1/2 z-100
-               w-7 h-7 rounded-full bg-[#171f33] border border-[#424754]/50
-               flex items-center justify-center
-               text-slate-400 hover:text-white hover:border-[#adc6ff]/40
-               shadow-md transition-all duration-200">
-        <span class="material-symbols-outlined text-base leading-none transition-transform duration-300"
-            id="toggle-icon">
-            chevron_left
-        </span>
-    </button>
+
 
     <div class="px-4 py-5 flex items-center justify-center border-b border-white/10 min-h-[72px]">
+        <h3 class="text-xl font-bold text-white">CMS</h3>
     </div>
 
     <nav class="flex flex-col h-full py-2 space-y-1">
@@ -146,6 +137,15 @@
     </nav>
 </aside>
 
+<button id="sidebar-toggle" onclick="toggleSidebar()" class="fixed  z-[60] w-7 h-7 rounded-full bg-[#171f33] border border-[#424754]/50
+           flex items-center justify-center
+           text-slate-400 hover:text-white hover:border-[#adc6ff]/40
+           shadow-md transition-all duration-300" style="left: 240px; top: 57px;">
+    <span class="material-symbols-outlined text-base leading-none transition-transform duration-300" id="toggle-icon">
+        chevron_left
+    </span>
+</button>
+
 <script>
     (function () {
         const KEY = 'sidebar-collapsed';
@@ -156,6 +156,7 @@
             const labels = sidebar.querySelectorAll('.sidebar-label');
             const logo = sidebar.querySelector('.sidebar-logo');
             const icon = document.getElementById('toggle-icon');
+            const toggleBtn = document.getElementById('sidebar-toggle'); // ✅ ADD THIS
 
             if (!animate) {
                 sidebar.style.transition = 'none';
@@ -172,6 +173,7 @@
                 labels.forEach(l => { l.style.width = '0'; l.style.opacity = '0'; });
                 if (logo) { logo.style.width = '0'; logo.style.opacity = '0'; }
                 if (icon) icon.textContent = 'chevron_right';
+                if (toggleBtn) toggleBtn.style.left = '52px'; // ✅ ADD THIS
             } else {
                 sidebar.classList.replace('w-16', 'w-64');
                 if (main) {
@@ -182,6 +184,7 @@
                 labels.forEach(l => { l.style.width = ''; l.style.opacity = '1'; });
                 if (logo) { logo.style.width = ''; logo.style.opacity = '1'; }
                 if (icon) icon.textContent = 'chevron_left';
+                if (toggleBtn) toggleBtn.style.left = '252px'; // ✅ ADD THIS
             }
 
             if (!animate) {
