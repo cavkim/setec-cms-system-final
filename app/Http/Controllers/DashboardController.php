@@ -142,7 +142,7 @@ class DashboardController extends Controller
         // ── SAFETY ────────────────────────────────────────────────
         $lastIncident = SafetyIncident::latest('incident_date')->first();
         $daysSafe = $lastIncident
-            ? \Carbon\Carbon::parse($lastIncident->incident_date)->diffInDays(now())
+            ? (int) abs(\Carbon\Carbon::parse($lastIncident->incident_date)->diffInDays(now()))
             : 0;
         $openIncidents = SafetyIncident::where('status', 'open')->count();
         $investigatingIncidents = SafetyIncident::where('status', 'investigating')->count();
