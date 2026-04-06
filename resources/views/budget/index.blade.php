@@ -27,6 +27,31 @@
         .row-active {
             background-color: rgba(173, 198, 255, 0.08) !important;
         }
+
+        /* Custom scrollbar for budget by project */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(173, 198, 255, 0.3);
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(173, 198, 255, 0.5);
+        }
+
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(173, 198, 255, 0.3) rgba(255, 255, 255, 0.05);
+        }
     </style>
 @endsection
 
@@ -110,27 +135,47 @@
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div class="bg-surface-container rounded-2xl p-8 shadow-lg">
-            <h3 class="text-xl font-bold font-headline text-white mb-7">Budget by Project</h3>
-            <div class="space-y-6">
+        <div class="bg-surface-container rounded-2xl shadow-lg flex flex-col">
+            <div class="p-8 pb-4">
+                <h3 class="text-xl font-bold font-headline text-white mb-2">Budget by Project</h3>
+                <p class="text-xs text-on-surface-variant mb-5">Overview of budget allocation and spending across all projects</p>
+            </div>
+            <div class="space-y-4 px-8 pb-6 overflow-y-auto custom-scrollbar" style="max-height: 450px;">
                 @foreach($projects as $p)
                     @php
                         $pct = $p->budget_pct ?? 0;
                         $barClass = $pct >= 90 ? 'bg-error' : ($pct >= 70 ? 'bg-secondary' : 'bg-primary');
                         $textClass = $pct >= 90 ? 'text-error' : ($pct >= 70 ? 'text-secondary' : 'text-primary');
+                        $remaining = $p->budget_allocated - $p->budget_spent;
+                        $remainingPct = $p->budget_allocated > 0 ? round(($remaining / $p->budget_allocated) * 100) : 0;
                     @endphp
-                    <div>
-                        <div class="flex justify-between text-sm mb-2">
-                            <span class="font-bold text-on-surface">{{ $p->project_name }}</span>
-                            <span class="text-on-surface-variant">${{ number_format($p->budget_allocated / 1000000, 1) }}M <span
-                                    class="{{ $textClass }} font-bold">({{ $pct }}%{{ $pct >= 90 ? ' ⚠' : '' }})</span></span>
+                    <div class="group p-4 rounded-xl bg-surface-container-low hover:bg-surface-container-low/80 border border-transparent hover:border-white/5 transition-all duration-200 cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <span class="font-bold text-on-surface text-sm group-hover:text-primary transition-colors">{{ $p->project_name }}</span>
+                                @if($pct >= 90)
+                                    <span class="ml-2 px-2 py-0.5 bg-error/20 text-error text-[10px] font-bold rounded-full border border-error/30">⚠ Critical</span>
+                                @elseif($pct >= 70)
+                                    <span class="ml-2 px-2 py-0.5 bg-secondary/20 text-secondary text-[10px] font-bold rounded-full border border-secondary/30">Warning</span>
+                                @endif
+                            </div>
+                            <div class="text-right">
+                                <span class="text-on-surface-variant text-xs">${{ number_format($p->budget_allocated / 1000000, 2) }}M</span>
+                                <div class="text-[10px] {{ $textClass }} font-bold mt-0.5">{{ $pct }}% used</div>
+                            </div>
                         </div>
-                        <div class="w-full h-2 bg-surface-container-lowest rounded-full overflow-hidden">
-                            <div class="{{ $barClass }} h-full rounded-full" style="width:{{ min($pct, 100) }}%"></div>
+                        <div class="w-full h-2.5 bg-surface-container-lowest rounded-full overflow-hidden mb-2">
+                            <div class="{{ $barClass }} h-full rounded-full transition-all duration-500 ease-out group-hover:opacity-80" style="width:{{ min($pct, 100) }}%"></div>
                         </div>
-                        <div class="flex justify-between text-[10px] text-on-surface-variant mt-1">
-                            <span>Spent: ${{ number_format($p->budget_spent) }}</span>
-                            <span>Remaining: ${{ number_format($p->budget_allocated - $p->budget_spent) }}</span>
+                        <div class="flex justify-between text-[11px] text-on-surface-variant">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">trending_up</span>
+                                Spent: ${{ number_format($p->budget_spent / 1000) }}K
+                            </span>
+                            <span class="flex items-center gap-1 {{ $remainingPct < 20 ? 'text-error' : 'text-tertiary' }}">
+                                <span class="material-symbols-outlined text-xs">account_balance_wallet</span>
+                                Remaining: ${{ number_format($remaining / 1000) }}K ({{ $remainingPct }}%)
+                            </span>
                         </div>
                     </div>
                 @endforeach
