@@ -80,6 +80,68 @@
             border-radius: 10px;
         }
 
+        /* Permission Matrix Scroll */
+        .perm-matrix-container {
+            max-height: 600px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .perm-matrix-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .perm-matrix-container::-webkit-scrollbar-track {
+            background: #0b1326;
+            border-radius: 10px;
+        }
+
+        .perm-matrix-container::-webkit-scrollbar-thumb {
+            background: #424754;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .perm-matrix-container::-webkit-scrollbar-thumb:hover {
+            background: #5a6178;
+        }
+
+        .perm-matrix-container::-webkit-scrollbar-corner {
+            background: #0b1326;
+        }
+
+        .perm-matrix-table thead tr {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        /* Role List Scroll */
+        .role-list-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .role-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .role-list-container::-webkit-scrollbar-track {
+            background: #0b1326;
+            border-radius: 10px;
+        }
+
+        .role-list-container::-webkit-scrollbar-thumb {
+            background: #424754;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .role-list-container::-webkit-scrollbar-thumb:hover {
+            background: #5a6178;
+        }
+
         /* Drawer animation */
         #create-role-drawer,
         #edit-role-drawer {
@@ -188,7 +250,7 @@
                     </button>
                 </div>
 
-                <div class="space-y-4">
+                <div class="role-list-container space-y-4 pr-2">
                     @php
                         $roleColors = [
                             'super_admin' => ['badge' => 'bg-primary/10 text-primary', 'border' => 'border-primary', 'icon' => 'verified', 'type' => 'System'],
@@ -283,8 +345,8 @@
                 </div>
 
                 <div class="bg-surface-container rounded-xl overflow-hidden shadow-xl">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse" id="perm-matrix-table">
+                    <div class="perm-matrix-container">
+                        <table class="w-full text-left border-collapse perm-matrix-table" id="perm-matrix-table">
                             <thead>
                                 <tr class="bg-surface-container-high">
                                     <th
