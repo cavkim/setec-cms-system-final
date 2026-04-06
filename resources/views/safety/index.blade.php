@@ -94,11 +94,11 @@
 
 {{-- ── Page Header ── --}}
 <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:28px;flex-wrap:wrap">
-  
+
     {{-- Days Without Incident Counter --}}
     <div style="position:relative">
         <div style="background:#222a3d;border:1px solid #424754;border-radius:18px;padding:20px 32px;display:flex;flex-direction:column;align-items:center">
-            <span style="font-size:42px;font-weight:900;color:#ffb95f;line-height:1">{{ $stats['days_safe'] }}</span>
+            <span style="font-size:42px;font-weight:900;color:#ffb95f;line-height:1">{{ $stats['days_safe'] }} {{ $stats['days_safe'] == 1 ? 'Day' : 'Days' }}</span>
             <span style="font-size:10px;font-weight:700;color:#c2c6d6;text-transform:uppercase;letter-spacing:.15em;margin-top:4px">Days without incident</span>
         </div>
     </div>
@@ -111,7 +111,7 @@
             <span class="material-symbols-outlined" style="color:#adc6ff">event_available</span>
             <span style="font-size:9px;font-weight:700;color:#8392a6;text-transform:uppercase;letter-spacing:.1em">Baseline</span>
         </div>
-        <div style="font-size:30px;font-weight:900;color:#dae2fd">{{ $stats['days_safe'] }}</div>
+        <div style="font-size:30px;font-weight:900;color:#dae2fd">{{ $stats['days_safe'] }} {{ $stats['days_safe'] == 1 ? 'Day' : 'Days' }}</div>
         <div style="font-size:12px;color:#c2c6d6;margin-top:4px">Days Since Last Incident</div>
     </div>
     <div style="background:#222a3d;border-radius:12px;padding:22px;transition:background .2s" onmouseenter="this.style.background='#31394d'" onmouseleave="this.style.background='#222a3d'">

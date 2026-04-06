@@ -26,7 +26,7 @@ class SafetyController extends Controller
         $incidents = $query->orderByDesc('safety_incidents.incident_date')->paginate(10);
 
         $last = DB::table('safety_incidents')->orderByDesc('incident_date')->first();
-        $daysSafe = $last ? \Carbon\Carbon::parse($last->incident_date)->diffInDays(now()) : 0;
+        $daysSafe = $last ? (int)\Carbon\Carbon::parse($last->incident_date)->diffInDays(now()) : 0;
 
         $stats = [
             'total' => DB::table('safety_incidents')->count(),
