@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SupportController;
 
 // ── AUTH ROUTES (Breeze handles these) ────────────────────
 require __DIR__ . '/auth.php';
@@ -143,6 +144,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('permission:view notifications');
     Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.readAll')
         ->middleware('permission:view notifications');
+
+    // Support — all auth users
+    Route::get('support', [SupportController::class, 'index'])->name('support.index');
 
     // Audit Log — super admin + admin only (via role middleware)
     Route::middleware('role:super_admin|admin')->group(function () {

@@ -119,8 +119,8 @@
                         class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Notifications</span>
                 </a>
             @endcan
-            <a class="text-slate-400 hover:bg-white/5 rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
-                href="#" onclick="toast('Support coming soon','info'); return false;" title="Support">
+            <a class="{{ request()->routeIs('support.*') ? 'bg-[#2d3449] text-blue-400 font-semibold' : 'text-slate-400 hover:bg-white/5' }} rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 transition-colors"
+                href="{{ route('support.index') }}" title="Support">
                 <span class="material-symbols-outlined flex-shrink-0">help</span>
                 <span
                     class="text-[0.875rem] sidebar-label whitespace-nowrap overflow-hidden transition-all duration-300">Support</span>
